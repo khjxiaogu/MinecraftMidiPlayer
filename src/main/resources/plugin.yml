@@ -1,0 +1,13 @@
+name: ${project.artifactId}
+main: ${project.groupId}.${project.artifactId}.${project.artifactId}
+version: ${project.version}
+author: khjxiaogu
+commands:
+  mcmidi:
+    description: midi插件指令
+    permission: ${project.artifactId}.admin
+    usage: /mcmidi
+permissions:
+  ${project.artifactId}.admin:
+    description: 播放midi的权限
+    default: op
