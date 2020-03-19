@@ -82,6 +82,6 @@ public class MCMidi extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin=this;
-		super.onEnable();
+		this.saveDefaultConfig();//save a dummy config to create plugin folder
 	}
 }
