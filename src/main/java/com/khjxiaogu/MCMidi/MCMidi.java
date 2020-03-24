@@ -205,7 +205,7 @@ public class MCMidi extends JavaPlugin {
 	@Override
 	public void onLoad() {
 		this.saveDefaultConfig();
-		NoteInfo.initNotes();
+		
 		ConfigurationSerialization.registerClass(NoteInfo.class);
 		ConfigurationSerialization.registerClass(NoteTrack.class);
 		ConfigurationSerialization.registerClass(MidiSheet.class);
@@ -213,6 +213,7 @@ public class MCMidi extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin=this;
+		NoteInfo.initNotes();
 		File cfg=new File(plugin.getDataFolder(),"data.yml");
 		if(cfg.exists()) {
 			try {
