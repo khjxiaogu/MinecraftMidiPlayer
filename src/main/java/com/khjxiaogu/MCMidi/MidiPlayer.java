@@ -120,7 +120,7 @@ class NotePlayer{
 			nc.notes.get(index).play(p);
 			index++;
 		}
-		
+		if(index>=nc.notes.size())return;
 		
 		long wait=nc.notes.get(index).ticks-curticks;
 		curticks=nc.notes.get(index).ticks;
@@ -138,81 +138,73 @@ class NoteInfo{
 	Note n;
 	org.bukkit.Instrument ins;
 	int volume=64;
+	private static org.bukkit.Instrument[] inss=new org.bukkit.Instrument[10];
+	private static Note[] notes=new Note[25];
+	static {
+		inss[9]=org.bukkit.Instrument.BASS_DRUM;
+		inss[8]=org.bukkit.Instrument.BASS_DRUM;
+		inss[7]=org.bukkit.Instrument.BASS_DRUM;
+		inss[6]=org.bukkit.Instrument.STICKS;
+		inss[5]=org.bukkit.Instrument.PIANO;
+		inss[4]=org.bukkit.Instrument.SNARE_DRUM;
+		inss[3]=org.bukkit.Instrument.BASS_GUITAR;
+		inss[2]=org.bukkit.Instrument.BASS_GUITAR;
+		inss[1]=org.bukkit.Instrument.BASS_GUITAR;
+		inss[0]=org.bukkit.Instrument.BASS_GUITAR;
+		notes[0]=Note.sharp(0,Tone.F);
+		notes[1]=Note.natural(0,Tone.G);
+		notes[2]=Note.sharp(0,Tone.G);
+		notes[3]=Note.natural(0,Tone.A);
+		notes[4]=Note.sharp(0,Tone.A);
+		notes[5]=Note.natural(0,Tone.B);
+		notes[6]=Note.natural(0,Tone.C);
+		notes[7]=Note.sharp(0,Tone.C);
+		notes[8]=Note.natural(0,Tone.D);
+		notes[9]=Note.sharp(0,Tone.D);
+		notes[10]=Note.natural(0,Tone.E);
+		notes[11]=Note.natural(0,Tone.F);
+		notes[12]=Note.sharp(1,Tone.F);
+		notes[13]=Note.natural(1,Tone.G);
+		notes[14]=Note.sharp(1,Tone.G);
+		notes[15]=Note.natural(1,Tone.A);
+		notes[16]=Note.sharp(1,Tone.A);
+		notes[17]=Note.natural(1,Tone.B);
+		notes[18]=Note.natural(1,Tone.C);
+		notes[19]=Note.sharp(1,Tone.C);
+		notes[20]=Note.natural(1,Tone.D);
+		notes[21]=Note.sharp(1,Tone.D);
+		notes[22]=Note.natural(1,Tone.E);
+		notes[23]=Note.natural(1,Tone.F);
+		notes[24]=Note.sharp(2,Tone.F);
+	}
 	public NoteInfo(long ticks) {
 		this.ticks=ticks;
 		n=null;
 	}
 	public NoteInfo(int key,long tick,int vol) {
-		int octave=key%12-4;
 		volume=vol;
-		ins=org.bukkit.Instrument.PIANO;
-		if(octave>1) {
-			//ins=org.bukkit.Instrument.STICKS;
-			octave=octave%2;
-		}
-		if(octave<-2) {
-			ins=org.bukkit.Instrument.BASS_DRUM;
-			octave=-octave%2;
-		}
-		if(octave<0) {
-			ins=org.bukkit.Instrument.BASS_GUITAR;
-			octave=-octave%2;
-		}
 		ticks=tick;
-		int note=key%12;
-		switch(note) {
-		case 0:n=Note.natural(octave,Tone.C);
-		case 1:n=Note.sharp(octave,Tone.C);
-		case 2:n=Note.natural(octave,Tone.D);
-		case 3:n=Note.sharp(octave,Tone.D);
-		case 4:n=Note.natural(octave,Tone.E);
-		case 5:n=Note.natural(octave,Tone.F);
-		case 6:n=Note.sharp(octave,Tone.F);
-		case 7:n=Note.natural(octave,Tone.G);
-		case 8:n=Note.sharp(octave,Tone.G);
-		case 9:n=Note.natural(octave,Tone.A);
-		case 10:n=Note.sharp(octave,Tone.A);
-		case 11:n=Note.natural(octave,Tone.B);
-		}
+		setMinecraftOctave(key/12);
+		setMinecraftNote(key%12);
+	}
+	private void setMinecraftNote(int note) {
+		n=notes[note+6];
+	}
+	private void setMinecraftOctave(int octave) {
+		ins=inss[octave];
+
 	}
 	public NoteInfo(int octave,int note,long tick,int vol) {
-		ins=org.bukkit.Instrument.PIANO;
-		if(octave>1) {
-			//ins=org.bukkit.Instrument.STICKS;
-			octave=octave%2;
-		}
-		if(octave<-2) {
-			ins=org.bukkit.Instrument.BASS_DRUM;
-			octave=-octave%2;
-		}
-		if(octave<0) {
-			ins=org.bukkit.Instrument.BASS_GUITAR;
-			octave=-octave%2;
-		}
 		volume=vol;
 		ticks=tick;
-		switch(note) {
-		case 0:n=Note.natural(octave,Tone.C);
-		case 1:n=Note.sharp(octave,Tone.C);
-		case 2:n=Note.natural(octave,Tone.D);
-		case 3:n=Note.sharp(octave,Tone.D);
-		case 4:n=Note.natural(octave,Tone.E);
-		case 5:n=Note.natural(octave,Tone.F);
-		case 6:n=Note.sharp(octave,Tone.F);
-		case 7:n=Note.natural(octave,Tone.G);
-		case 8:n=Note.sharp(octave,Tone.G);
-		case 9:n=Note.natural(octave,Tone.A);
-		case 10:n=Note.sharp(octave,Tone.A);
-		case 11:n=Note.natural(octave,Tone.B);
-		}
+		setMinecraftOctave(octave);
+		setMinecraftNote(note);
 	}
 	public static NoteInfo getNote(int key,long tick,int vol) {
-		//int octave=key%12-4;
-		//if(octave>1||octave<0)return null;
 		return new NoteInfo(key,tick,vol);
 	}
 	public void play(Player p) {
 		if(n!=null)
-		p.playNote(p.getLocation().add(p.getLocation().getDirection().multiply((127-volume)*5)),ins, n);
+		p.playNote(p.getLocation()/*.add(p.getLocation().getDirection().multiply((127-volume)*5))*/,ins, n);
 	}
 }
