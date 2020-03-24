@@ -3,107 +3,126 @@ package com.khjxiaogu.MCMidi.Midi;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Instrument;
 import org.bukkit.Note;
 import org.bukkit.Note.Tone;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 
 import com.khjxiaogu.MCMidi.MCMidi;
 
-
-public class NoteInfo implements ConfigurationSerializable{
-	@FunctionalInterface 
-	interface Initializer{
-		public void init(NoteInfo n,int key);
+public class NoteInfo implements ConfigurationSerializable {
+	@FunctionalInterface
+	interface Initializer {
+		public void init(NoteInfo n, int key);
 	}
+
 	long ticks;
 	Note n;
-	org.bukkit.Instrument ins;
-	int volume=64;
-	private final static org.bukkit.Instrument[] inss=new org.bukkit.Instrument[10];
-	private final static Note[] notes=new Note[25];
+	Instrument ins;
+	int volume = 64;
+	private final static Instrument[] inss = new Instrument[10];
+	private final static Note[] notes = new Note[25];
 	private static Initializer init;
 	private final int key;
+
 	public static void initNotes() {
-		if(!MCMidi.plugin.getConfig().getBoolean("universal",false)){
-			inss[9]=org.bukkit.Instrument.BASS_DRUM;
-			inss[8]=org.bukkit.Instrument.BASS_DRUM;
-			inss[7]=org.bukkit.Instrument.BASS_DRUM;
-			inss[6]=org.bukkit.Instrument.STICKS;
-			inss[5]=org.bukkit.Instrument.PIANO;
-			inss[4]=org.bukkit.Instrument.SNARE_DRUM;
-			inss[3]=org.bukkit.Instrument.BASS_GUITAR;
-			inss[2]=org.bukkit.Instrument.BASS_GUITAR;
-			inss[1]=org.bukkit.Instrument.BASS_GUITAR;
-			inss[0]=org.bukkit.Instrument.BASS_GUITAR;
-			init=(t,k)->{t.n=notes[k%12];t.ins=inss[k/12];};
-		}else {
-			inss[9]=org.bukkit.Instrument.BELL;
-			inss[8]=org.bukkit.Instrument.BELL;
-			inss[7]=org.bukkit.Instrument.SNARE_DRUM;
-			inss[6]=org.bukkit.Instrument.SNARE_DRUM;
-			inss[5]=org.bukkit.Instrument.PIANO;
-			inss[4]=org.bukkit.Instrument.PIANO;
-			inss[3]=org.bukkit.Instrument.BASS_GUITAR;
-			inss[2]=org.bukkit.Instrument.BASS_GUITAR;
-			inss[1]=org.bukkit.Instrument.BASS_DRUM;
-			inss[0]=org.bukkit.Instrument.BASS_DRUM;
-			init=(t,k)->{t.n=notes[k%24];t.ins=inss[k/12];};
+		if (!MCMidi.plugin.getConfig().getBoolean("universal", false)) {
+			NoteInfo.inss[9] = Instrument.BASS_DRUM;
+			NoteInfo.inss[8] = Instrument.BASS_DRUM;
+			NoteInfo.inss[7] = Instrument.BASS_DRUM;
+			NoteInfo.inss[6] = Instrument.STICKS;
+			NoteInfo.inss[5] = Instrument.PIANO;
+			NoteInfo.inss[4] = Instrument.SNARE_DRUM;
+			NoteInfo.inss[3] = Instrument.BASS_GUITAR;
+			NoteInfo.inss[2] = Instrument.BASS_GUITAR;
+			NoteInfo.inss[1] = Instrument.BASS_GUITAR;
+			NoteInfo.inss[0] = Instrument.BASS_GUITAR;
+			NoteInfo.init = (t, k) -> {
+				t.n = NoteInfo.notes[k % 12];
+				t.ins = NoteInfo.inss[k / 12];
+			};
+		} else {
+			NoteInfo.inss[9] = Instrument.SNARE_DRUM;
+			NoteInfo.inss[8] = Instrument.SNARE_DRUM;
+			Instrument Bell;
+			try {
+				Bell = Instrument.valueOf("BELL");// attempt to use 1.12 bell to provide better performation
+			} catch (Throwable t) {
+				Bell = Instrument.SNARE_DRUM;
+			}
+			NoteInfo.inss[7] = Bell;
+			NoteInfo.inss[6] = Bell;
+			NoteInfo.inss[5] = Instrument.PIANO;
+			NoteInfo.inss[4] = Instrument.PIANO;
+			NoteInfo.inss[3] = Instrument.BASS_GUITAR;
+			NoteInfo.inss[2] = Instrument.BASS_GUITAR;
+			NoteInfo.inss[1] = Instrument.BASS_DRUM;
+			NoteInfo.inss[0] = Instrument.BASS_DRUM;
+			NoteInfo.init = (t, k) -> {
+				t.n = NoteInfo.notes[k % 24];
+				t.ins = NoteInfo.inss[k / 12];
+			};
 		}
-		notes[0]=Note.sharp(0,Tone.F);
-		notes[1]=Note.natural(0,Tone.G);
-		notes[2]=Note.sharp(0,Tone.G);
-		notes[3]=Note.natural(0,Tone.A);
-		notes[4]=Note.sharp(0,Tone.A);
-		notes[5]=Note.natural(0,Tone.B);
-		notes[6]=Note.natural(0,Tone.C);
-		notes[7]=Note.sharp(0,Tone.C);
-		notes[8]=Note.natural(0,Tone.D);
-		notes[9]=Note.sharp(0,Tone.D);
-		notes[10]=Note.natural(0,Tone.E);
-		notes[11]=Note.natural(0,Tone.F);
-		notes[12]=Note.sharp(1,Tone.F);
-		notes[13]=Note.natural(1,Tone.G);
-		notes[14]=Note.sharp(1,Tone.G);
-		notes[15]=Note.natural(1,Tone.A);
-		notes[16]=Note.sharp(1,Tone.A);
-		notes[17]=Note.natural(1,Tone.B);
-		notes[18]=Note.natural(1,Tone.C);
-		notes[19]=Note.sharp(1,Tone.C);
-		notes[20]=Note.natural(1,Tone.D);
-		notes[21]=Note.sharp(1,Tone.D);
-		notes[22]=Note.natural(1,Tone.E);
-		notes[23]=Note.natural(1,Tone.F);
-		notes[24]=Note.sharp(2,Tone.F);
-	} 
-	public NoteInfo(long ticks) {
-		this.ticks=ticks;
-		n=null;
-		key=0;
+		NoteInfo.notes[0] = Note.sharp(0, Tone.F);
+		NoteInfo.notes[1] = Note.natural(0, Tone.G);
+		NoteInfo.notes[2] = Note.sharp(0, Tone.G);
+		NoteInfo.notes[3] = Note.natural(0, Tone.A);
+		NoteInfo.notes[4] = Note.sharp(0, Tone.A);
+		NoteInfo.notes[5] = Note.natural(0, Tone.B);
+		NoteInfo.notes[6] = Note.natural(0, Tone.C);
+		NoteInfo.notes[7] = Note.sharp(0, Tone.C);
+		NoteInfo.notes[8] = Note.natural(0, Tone.D);
+		NoteInfo.notes[9] = Note.sharp(0, Tone.D);
+		NoteInfo.notes[10] = Note.natural(0, Tone.E);
+		NoteInfo.notes[11] = Note.natural(0, Tone.F);
+		NoteInfo.notes[12] = Note.sharp(1, Tone.F);
+		NoteInfo.notes[13] = Note.natural(1, Tone.G);
+		NoteInfo.notes[14] = Note.sharp(1, Tone.G);
+		NoteInfo.notes[15] = Note.natural(1, Tone.A);
+		NoteInfo.notes[16] = Note.sharp(1, Tone.A);
+		NoteInfo.notes[17] = Note.natural(1, Tone.B);
+		NoteInfo.notes[18] = Note.natural(1, Tone.C);
+		NoteInfo.notes[19] = Note.sharp(1, Tone.C);
+		NoteInfo.notes[20] = Note.natural(1, Tone.D);
+		NoteInfo.notes[21] = Note.sharp(1, Tone.D);
+		NoteInfo.notes[22] = Note.natural(1, Tone.E);
+		NoteInfo.notes[23] = Note.natural(1, Tone.F);
+		NoteInfo.notes[24] = Note.sharp(2, Tone.F);
 	}
-	public NoteInfo(int key,long tick,int vol) {
-		volume=vol;
-		ticks=tick;
-		init.init(this, key);
-		this.key=key;
+
+	public NoteInfo(long ticks) {
+		this.ticks = ticks;
+		n = null;
+		key = 0;
+	}
+
+	public NoteInfo(int key, long tick, int vol) {
+		volume = vol;
+		ticks = tick;
+		NoteInfo.init.init(this, key);
+		this.key = key;
 	}
 
 	public NoteInfo(Map<?, ?> map) {
-		this((int)map.get("k"),(int)map.get("t"),(int)map.get("v"));
+		this((int) map.get("k"), (int) map.get("t"), (int) map.get("v"));
 	}
-	public static NoteInfo getNote(int key,long tick,int vol) {
-		return new NoteInfo(key,tick,vol);
+
+	public static NoteInfo getNote(int key, long tick, int vol) {
+		return new NoteInfo(key, tick, vol);
 	}
+
 	public void play(Player p) {
-		if(n!=null)
-			p.playNote(p.getLocation(),ins, n);
+		if (n != null) {
+			p.playNote(p.getLocation(), ins, n);
+		}
 	}
+
 	@Override
 	public Map<String, Object> serialize() {
-		Map<String,Object> map=new HashMap<>();
-		map.put("k",key);
-		map.put("t",ticks);
+		Map<String, Object> map = new HashMap<>();
+		map.put("k", key);
+		map.put("t", ticks);
 		map.put("v", volume);
 		return map;
 	}
