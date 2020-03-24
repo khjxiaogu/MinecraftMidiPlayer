@@ -9,12 +9,14 @@ import java.util.Map;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 
+import com.khjxiaogu.MCMidi.Messages;
+
 public class NoteTrack implements ConfigurationSerializable{
 	List<NoteInfo> notes=new ArrayList<>();
 	public NoteTrack() {}
 	@SuppressWarnings("unchecked")
 	public NoteTrack(Map<String, Object> map) {
-		notes.addAll((Collection<NoteInfo>) map.get("notes"));
+		notes.addAll((Collection<NoteInfo>) map.get("notes")); //$NON-NLS-1$
 	}
 	public void add(int key,long tick,int vol) {
 		NoteInfo ni=NoteInfo.getNote(key, tick,vol);
@@ -27,12 +29,12 @@ public class NoteTrack implements ConfigurationSerializable{
 		return ret;
 	}
 	public String getInfo() {
-		return "Notes: "+notes.size()+" Length: "+notes.get(notes.size()-1);
+		return Messages.getString("MCMidi.track_note_count")+notes.size()+Messages.getString("MCMidi.track_length")+notes.get(notes.size()-1); //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	@Override
 	public Map<String, Object> serialize() {
 		Map<String,Object> map=new HashMap<>();
-		map.put("notes",notes);
+		map.put("notes",notes); //$NON-NLS-1$
 		return map;
 	}
 }

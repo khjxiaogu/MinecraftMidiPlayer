@@ -81,7 +81,7 @@ public class NoteInfo implements ConfigurationSerializable{
 	}
 	public void play(Player p) {
 		if(n!=null)
-			p.playNote(p.getLocation()/*.add(p.getLocation().getDirection().multiply((127-volume)*5))*/,ins, n);
+			p.playNote(p.getLocation(),ins, n);
 	}
 	@Override
 	public Map<String, Object> serialize() {

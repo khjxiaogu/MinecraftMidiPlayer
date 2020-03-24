@@ -72,7 +72,7 @@ public class MCMidi extends JavaPlugin {
 					if(sender instanceof Player)
 						p=(Player) sender;
 					else {
-						sender.sendMessage("Your must be a player to do this");
+						sender.sendMessage(Messages.getString("MCMidi.must_be_player"));//$NON-NLS-1$
 						return false;
 					}
 				}
@@ -100,7 +100,7 @@ public class MCMidi extends JavaPlugin {
 					if(sender instanceof Player)
 						p=(Player) sender;
 					else {
-						sender.sendMessage("Your must be a player to do this");
+						sender.sendMessage(Messages.getString("MCMidi.must_be_player"));//$NON-NLS-1$
 						return false;
 					}
 				}
@@ -139,7 +139,7 @@ public class MCMidi extends JavaPlugin {
 					if(sender instanceof Player)
 						p=(Player) sender;
 					else {
-						sender.sendMessage("Your must be a player to do this");
+						sender.sendMessage(Messages.getString("MCMidi.must_be_player"));//$NON-NLS-1$
 						return false;
 					}
 				}
@@ -148,7 +148,7 @@ public class MCMidi extends JavaPlugin {
 					np.cancel();
 				return true;
 			}else if(args[0].equals("list")) { //$NON-NLS-1$
-				sender.sendMessage("list of loaded midi files");
+				sender.sendMessage(Messages.getString("MCMidi.list_of_file"));
 				loaded.keySet().forEach((s)->{sender.sendMessage(s);});
 				return true;
 			}
@@ -165,13 +165,13 @@ public class MCMidi extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin=this;
-		ConfigurationSection cs=this.getConfig().getConfigurationSection("midi");
+		ConfigurationSection cs=this.getConfig().getConfigurationSection("midi");//$NON-NLS-1$
 		if(cs!=null) {
 			for(String s:cs.getKeys(false)) {
 				try {
 					loaded.put(s,(MidiSheet) cs.get(s));
 				}catch(Throwable t) {
-					getLogger().info("midi "+s+" load failure");
+					getLogger().info("midi "+s+" load failure");//$NON-NLS-1$-2$
 				}
 			}
 		}
@@ -180,7 +180,7 @@ public class MCMidi extends JavaPlugin {
 	public void onDisable() {
 		plugin=this;
 		this.saveDefaultConfig();//save a dummy config to create plugin folder
-		ConfigurationSection cs=this.getConfig().createSection("midi");
+		ConfigurationSection cs=this.getConfig().createSection("midi");//$NON-NLS-1$
 		loaded.forEach((n,m)->{cs.set(n,m);});
 	}
 }
