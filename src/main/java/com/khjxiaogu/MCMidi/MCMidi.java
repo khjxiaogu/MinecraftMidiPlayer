@@ -172,27 +172,29 @@ public class MCMidi extends JavaPlugin {
 			list.add("stop");
 			list.add("info");
 			list.add("list");
-			
+			filterList(args[0],list);
 		}else if(args.length==2) {
 			if(args[0].equals("load")) 
-				list.addAll(Arrays.asList(this.getDataFolder().list((d,n)->{return !n.contains(".cfg");})));
+				list.addAll(Arrays.asList(this.getDataFolder().list((d,n)->{return !n.endsWith(".cfg");})));
 			else if(args[0].equals("play")||args[0].equals("loop")) 
 				list.addAll(loaded.keySet());
 			else if(args[0].equals("stop"))
 				return null;
 			else if(args[0].equals("info"))
 				list.addAll(loaded.keySet());
-			
+			filterList(args[1],list);
 		}else if(args.length==3) {
 			if(args[0].equals("play")||args[0].equals("loop")) 
 				return null;
 			else if(args[0].equals("load"))
 				list.add("0");
+			filterList(args[2],list);
 		}else if(args.length==4) {
 			if(args[0].equals("load"))
 				list.add("1");
+			filterList(args[3],list);
 		}
-		filterList(args[0],list);
+		
 		return list;
 	}
 	@Override
