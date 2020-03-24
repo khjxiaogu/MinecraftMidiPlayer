@@ -26,6 +26,7 @@ public class TrackPlayer{
 		curticks=0;
 		canceled=false;
 		synchronized(finished) {finished=false;}
+		play();
 	}
 	public void cancel() {
 		canceled=true;

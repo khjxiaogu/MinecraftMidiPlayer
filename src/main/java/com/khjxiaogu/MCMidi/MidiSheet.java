@@ -33,7 +33,7 @@ public class MidiSheet implements ConfigurationSerializable{
         for (Track track :  sequence.getTracks()) {
         	NoteTrack currentTrack;
         	tracks.add(currentTrack=new NoteTrack());
-        	float beatsPerMinute=80;
+        	float beatsPerMinute=120;
             for (int i=0; i < track.size(); i++) {
             	float millisPerMidiTick;
             	if(framesPerSecond==0F) {//PPQ mode

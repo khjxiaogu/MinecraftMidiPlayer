@@ -1,7 +1,11 @@
 package com.khjxiaogu.MCMidi;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -44,7 +48,7 @@ public class MCMidi extends JavaPlugin {
 						off=Integer.parseInt(args[2]);
 					float factor=1;
 					if(args.length>=4)
-						factor=Integer.parseInt(args[3]);
+						factor=Float.parseFloat(args[3]);
 					if(f.exists()) {
 					MidiSheet mp=new MidiSheet(f,off,factor);
 					loaded.put(args[1],mp);
@@ -148,12 +152,48 @@ public class MCMidi extends JavaPlugin {
 					np.cancel();
 				return true;
 			}else if(args[0].equals("list")) { //$NON-NLS-1$
-				sender.sendMessage(Messages.getString("MCMidi.list_of_file"));
+				sender.sendMessage(Messages.getString("MCMidi.list_of_file"));//$NON-NLS-1$
 				loaded.keySet().forEach((s)->{sender.sendMessage(s);});
 				return true;
 			}
 		}
 		return false;
+	}
+	public void filterList(String input,List<String> list) {
+		list.removeIf((s)->{return !s.startsWith(input);});
+	}
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		List<String> list=new ArrayList<>();
+		if(args.length==1) {
+			list.add("load");
+			list.add("play");
+			list.add("loop");
+			list.add("stop");
+			list.add("info");
+			list.add("list");
+			
+		}else if(args.length==2) {
+			if(args[0].equals("load")) 
+				list.addAll(Arrays.asList(this.getDataFolder().list((d,n)->{return !n.contains(".cfg");})));
+			else if(args[0].equals("play")||args[0].equals("loop")) 
+				list.addAll(loaded.keySet());
+			else if(args[0].equals("stop"))
+				return null;
+			else if(args[0].equals("info"))
+				list.addAll(loaded.keySet());
+			
+		}else if(args.length==3) {
+			if(args[0].equals("play")||args[0].equals("loop")) 
+				return null;
+			else if(args[0].equals("load"))
+				list.add("0");
+		}else if(args.length==4) {
+			if(args[0].equals("load"))
+				list.add("1");
+		}
+		filterList(args[0],list);
+		return list;
 	}
 	@Override
 	public void onLoad() {
@@ -171,7 +211,7 @@ public class MCMidi extends JavaPlugin {
 				try {
 					loaded.put(s,(MidiSheet) cs.get(s));
 				}catch(Throwable t) {
-					getLogger().info("midi "+s+" load failure");//$NON-NLS-1$-2$
+					getLogger().info("midi "+s+" load failure");//$NON-NLS-1$ //$NON-NLS-2$
 				}
 			}
 		}
@@ -182,5 +222,6 @@ public class MCMidi extends JavaPlugin {
 		this.saveDefaultConfig();//save a dummy config to create plugin folder
 		ConfigurationSection cs=this.getConfig().createSection("midi");//$NON-NLS-1$
 		loaded.forEach((n,m)->{cs.set(n,m);});
+		this.saveConfig();
 	}
 }

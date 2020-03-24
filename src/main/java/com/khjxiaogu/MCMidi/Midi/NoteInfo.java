@@ -8,26 +8,48 @@ import org.bukkit.Note.Tone;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 
+import com.khjxiaogu.MCMidi.MCMidi;
+
 
 public class NoteInfo implements ConfigurationSerializable{
+	@FunctionalInterface 
+	interface Initializer{
+		public void init(NoteInfo n,int key);
+	}
 	long ticks;
 	Note n;
 	org.bukkit.Instrument ins;
 	int volume=64;
-	private static org.bukkit.Instrument[] inss=new org.bukkit.Instrument[10];
-	private static Note[] notes=new Note[25];
+	private final static org.bukkit.Instrument[] inss=new org.bukkit.Instrument[10];
+	private final static Note[] notes=new Note[25];
+	private static Initializer init;
 	private final int key;
-	static {
-		inss[9]=org.bukkit.Instrument.BASS_DRUM;
-		inss[8]=org.bukkit.Instrument.BASS_DRUM;
-		inss[7]=org.bukkit.Instrument.BASS_DRUM;
-		inss[6]=org.bukkit.Instrument.STICKS;
-		inss[5]=org.bukkit.Instrument.PIANO;
-		inss[4]=org.bukkit.Instrument.SNARE_DRUM;
-		inss[3]=org.bukkit.Instrument.BASS_GUITAR;
-		inss[2]=org.bukkit.Instrument.BASS_GUITAR;
-		inss[1]=org.bukkit.Instrument.BASS_GUITAR;
-		inss[0]=org.bukkit.Instrument.BASS_GUITAR;
+	public static void initNotes() {
+		if(!MCMidi.plugin.getConfig().getBoolean("universal",false)){
+			inss[9]=org.bukkit.Instrument.BASS_DRUM;
+			inss[8]=org.bukkit.Instrument.BASS_DRUM;
+			inss[7]=org.bukkit.Instrument.BASS_DRUM;
+			inss[6]=org.bukkit.Instrument.STICKS;
+			inss[5]=org.bukkit.Instrument.PIANO;
+			inss[4]=org.bukkit.Instrument.SNARE_DRUM;
+			inss[3]=org.bukkit.Instrument.BASS_GUITAR;
+			inss[2]=org.bukkit.Instrument.BASS_GUITAR;
+			inss[1]=org.bukkit.Instrument.BASS_GUITAR;
+			inss[0]=org.bukkit.Instrument.BASS_GUITAR;
+			init=(t,k)->{t.n=notes[k%12];t.ins=inss[k/12];};
+		}else {
+			inss[9]=org.bukkit.Instrument.BELL;
+			inss[8]=org.bukkit.Instrument.BELL;
+			inss[7]=org.bukkit.Instrument.SNARE_DRUM;
+			inss[6]=org.bukkit.Instrument.SNARE_DRUM;
+			inss[5]=org.bukkit.Instrument.PIANO;
+			inss[4]=org.bukkit.Instrument.PIANO;
+			inss[3]=org.bukkit.Instrument.BASS_GUITAR;
+			inss[2]=org.bukkit.Instrument.BASS_GUITAR;
+			inss[1]=org.bukkit.Instrument.BASS_DRUM;
+			inss[0]=org.bukkit.Instrument.BASS_DRUM;
+			init=(t,k)->{t.n=notes[k%24];t.ins=inss[k/12];};
+		}
 		notes[0]=Note.sharp(0,Tone.F);
 		notes[1]=Note.natural(0,Tone.G);
 		notes[2]=Note.sharp(0,Tone.G);
@@ -53,7 +75,7 @@ public class NoteInfo implements ConfigurationSerializable{
 		notes[22]=Note.natural(1,Tone.E);
 		notes[23]=Note.natural(1,Tone.F);
 		notes[24]=Note.sharp(2,Tone.F);
-	}
+	} 
 	public NoteInfo(long ticks) {
 		this.ticks=ticks;
 		n=null;
@@ -62,19 +84,12 @@ public class NoteInfo implements ConfigurationSerializable{
 	public NoteInfo(int key,long tick,int vol) {
 		volume=vol;
 		ticks=tick;
-		setMinecraftOctave(key/12);
-		setMinecraftNote(key%12);
+		init.init(this, key);
 		this.key=key;
 	}
+
 	public NoteInfo(Map<String,Object> map) {
 		this((int)map.get("key"),(long)map.get("time"),(int)map.get("volume"));
-	}
-	private void setMinecraftNote(int note) {
-		n=notes[note+6];
-	}
-	private void setMinecraftOctave(int octave) {
-		ins=inss[octave];
-
 	}
 	public static NoteInfo getNote(int key,long tick,int vol) {
 		return new NoteInfo(key,tick,vol);

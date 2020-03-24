@@ -29,7 +29,10 @@ public class NoteTrack implements ConfigurationSerializable{
 		return ret;
 	}
 	public String getInfo() {
-		return Messages.getString("MCMidi.track_note_count")+notes.size()+Messages.getString("MCMidi.track_length")+notes.get(notes.size()-1); //$NON-NLS-1$ //$NON-NLS-2$
+		if(notes.size()>0)
+			return Messages.getString("MCMidi.track_note_count")+notes.size()+Messages.getString("MCMidi.track_length")+notes.get(notes.size()-1); //$NON-NLS-1$ //$NON-NLS-2$
+		else
+			return Messages.getString("MCMidi.track_note_count")+0+Messages.getString("MCMidi.track_length")+0; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	@Override
 	public Map<String, Object> serialize() {
