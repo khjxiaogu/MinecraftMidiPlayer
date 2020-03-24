@@ -1,5 +1,5 @@
 # MCMidi
-midi parse and play plugin for minecraft bukkit server  
+a simple plugin to play midi in your minecraft server!
 适用于Minecraft bukkit的解析和播放midi插件  
 # How to use  
 1.install this plugin in plugins folder.   
