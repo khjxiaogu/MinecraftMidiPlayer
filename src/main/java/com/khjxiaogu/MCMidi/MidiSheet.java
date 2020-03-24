@@ -14,9 +14,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.khjxiaogu.MCMidi.Midi.TrackPlayer;
+import com.khjxiaogu.MCMidi.Midi.NotePlayers;
 import com.khjxiaogu.MCMidi.Midi.NoteTrack;
 public class MidiSheet implements ConfigurationSerializable{
-	List<NoteTrack> tracks=new ArrayList<>();
+	public List<NoteTrack> tracks=new ArrayList<>();
 	public MidiSheet(Map<String, Object> map) {
 		tracks.addAll((Collection<NoteTrack>) map.get("tracks"));
 	}
@@ -31,9 +32,9 @@ public class MidiSheet implements ConfigurationSerializable{
         }
         int resolution=sequence.getResolution();
         for (Track track :  sequence.getTracks()) {
-        	NoteTrack currentTrack;
-        	tracks.add(currentTrack=new NoteTrack());
+        	NoteTrack currentTrack=new NoteTrack();
         	float beatsPerMinute=120;
+        	if(track.size()>0)
             for (int i=0; i < track.size(); i++) {
             	float millisPerMidiTick;
             	if(framesPerSecond==0F) {//PPQ mode
@@ -62,6 +63,8 @@ public class MidiSheet implements ConfigurationSerializable{
                 	}
                 }
             }
+        	if(currentTrack.getSize()!=0)
+        		tracks.add(currentTrack);
         }
 	}
 	public NotePlayers playFor(Player p) {
@@ -89,41 +92,6 @@ public class MidiSheet implements ConfigurationSerializable{
 	}
 }
 
-class NotePlayers{
-	List<TrackPlayer> players=new ArrayList<>();
-	BukkitRunnable loopDetect=null;
-	public NotePlayers(Player p,MidiSheet mp,boolean loop) {
-		for(NoteTrack nc:mp.tracks) {
-			players.add(nc.playAll(p));
-		}
-		if(loop) {
-			loopDetect=new BukkitRunnable() {
-				@Override
-				public void run() {
-					for(TrackPlayer np:players) {
-						if(!np.isFinished())
-							return;
-					}
-					reset();
-				}};
-			loopDetect.runTaskTimerAsynchronously(MCMidi.plugin,100,40);
-		}
-	}
-	public NotePlayers(Player p,MidiSheet mp) {
-		this(p,mp,false);
-	}
-	public void reset() {
-		for(TrackPlayer np:players) {
-			np.reset();
-		}
-	}
-	public void cancel() {
-		if(loopDetect!=null)
-			loopDetect.cancel();
-		for(TrackPlayer np:players) {
-			np.cancel();
-		}
-	}
-}
+
 
 

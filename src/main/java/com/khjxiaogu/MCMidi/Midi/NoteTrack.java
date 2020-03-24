@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 
@@ -16,7 +17,9 @@ public class NoteTrack implements ConfigurationSerializable{
 	public NoteTrack() {}
 	@SuppressWarnings("unchecked")
 	public NoteTrack(Map<String, Object> map) {
-		notes.addAll((Collection<NoteInfo>) map.get("notes")); //$NON-NLS-1$
+		for(Map<?,?> ms:(List<Map<String,Object>>)map.get("notes")) {
+			notes.add(new NoteInfo(ms));
+		}
 	}
 	public void add(int key,long tick,int vol) {
 		NoteInfo ni=NoteInfo.getNote(key, tick,vol);
@@ -28,16 +31,25 @@ public class NoteTrack implements ConfigurationSerializable{
 		ret.play();
 		return ret;
 	}
+	public int getSize() {
+		return notes.size();
+	}
 	public String getInfo() {
 		if(notes.size()>0)
-			return Messages.getString("MCMidi.track_note_count")+notes.size()+Messages.getString("MCMidi.track_length")+notes.get(notes.size()-1); //$NON-NLS-1$ //$NON-NLS-2$
+			return Messages.getString("MCMidi.track_note_count")+notes.size()+Messages.getString("MCMidi.track_length")+notes.get(notes.size()-1).ticks+"ticks"; //$NON-NLS-1$ //$NON-NLS-2$
 		else
 			return Messages.getString("MCMidi.track_note_count")+0+Messages.getString("MCMidi.track_length")+0; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 	@Override
 	public Map<String, Object> serialize() {
 		Map<String,Object> map=new HashMap<>();
-		map.put("notes",notes); //$NON-NLS-1$
+		List<Map<String,Object>> lso=new ArrayList<>(notes.size());
+		if(notes.size()>0) {
+			for(int i=0;i<notes.size();i++) {
+				lso.add(notes.get(i).serialize());
+			}
+			map.put("notes",lso); //$NON-NLS-1$
+		}
 		return map;
 	}
 }

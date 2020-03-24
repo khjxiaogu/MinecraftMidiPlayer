@@ -15,17 +15,22 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.khjxiaogu.MCMidi.Midi.NoteInfo;
+import com.khjxiaogu.MCMidi.Midi.NotePlayers;
 import com.khjxiaogu.MCMidi.Midi.NoteTrack;
 
 public class MCMidi extends JavaPlugin {
 	public static MCMidi plugin;
 	public Map<String,MidiSheet> loaded=new ConcurrentHashMap<>();
 	Map<Player,NotePlayers> nps=new ConcurrentHashMap<>();
+	FileConfiguration midifile=new YamlConfiguration();
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(args.length==0) {
@@ -200,6 +205,7 @@ public class MCMidi extends JavaPlugin {
 	@Override
 	public void onLoad() {
 		this.saveDefaultConfig();
+		NoteInfo.initNotes();
 		ConfigurationSerialization.registerClass(NoteInfo.class);
 		ConfigurationSerialization.registerClass(NoteTrack.class);
 		ConfigurationSerialization.registerClass(MidiSheet.class);
@@ -207,23 +213,38 @@ public class MCMidi extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		plugin=this;
-		ConfigurationSection cs=this.getConfig().getConfigurationSection("midi");//$NON-NLS-1$
-		if(cs!=null) {
-			for(String s:cs.getKeys(false)) {
-				try {
-					loaded.put(s,(MidiSheet) cs.get(s));
-				}catch(Throwable t) {
-					getLogger().info("midi "+s+" load failure");//$NON-NLS-1$ //$NON-NLS-2$
+		File cfg=new File(plugin.getDataFolder(),"data.yml");
+		if(cfg.exists()) {
+			try {
+				midifile.load(cfg);
+				ConfigurationSection cs=midifile.getConfigurationSection("midi");//$NON-NLS-1$
+				if(cs!=null) {
+					for(String s:cs.getKeys(false)) {
+						try {
+							ConfigurationSection cur=cs.getConfigurationSection(s);
+							loaded.put((String) cur.get("name"),(MidiSheet) cur.get("midi"));
+						}catch(Throwable t) {
+							getLogger().info("midi "+s+" load failure");//$NON-NLS-1$ //$NON-NLS-2$
+						}
+					}
 				}
+			} catch (IOException | InvalidConfigurationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
 	}
 	@Override
 	public void onDisable() {
 		plugin=this;
-		this.saveDefaultConfig();//save a dummy config to create plugin folder
-		ConfigurationSection cs=this.getConfig().createSection("midi");//$NON-NLS-1$
-		loaded.forEach((n,m)->{cs.set(n,m);});
-		this.saveConfig();
+		ConfigurationSection cs=midifile.createSection("midi");//$NON-NLS-1$
+		int i=0;
+		loaded.forEach((n,m)->{ConfigurationSection cur=cs.createSection(Integer.toString(i));cur.set("name",n);cur.set("midi",m);});
+		try {
+			midifile.save(new File(plugin.getDataFolder(),"data.yml"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

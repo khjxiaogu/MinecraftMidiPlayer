@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.bukkit.Note;
 import org.bukkit.Note.Tone;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 
@@ -88,8 +89,8 @@ public class NoteInfo implements ConfigurationSerializable{
 		this.key=key;
 	}
 
-	public NoteInfo(Map<String,Object> map) {
-		this((int)map.get("key"),(long)map.get("time"),(int)map.get("volume"));
+	public NoteInfo(Map<?, ?> map) {
+		this((int)map.get("k"),(int)map.get("t"),(int)map.get("v"));
 	}
 	public static NoteInfo getNote(int key,long tick,int vol) {
 		return new NoteInfo(key,tick,vol);
@@ -101,9 +102,9 @@ public class NoteInfo implements ConfigurationSerializable{
 	@Override
 	public Map<String, Object> serialize() {
 		Map<String,Object> map=new HashMap<>();
-		map.put("key",key);
-		map.put("time",ticks);
-		map.put("volume", volume);
+		map.put("k",key);
+		map.put("t",ticks);
+		map.put("v", volume);
 		return map;
 	}
 }
