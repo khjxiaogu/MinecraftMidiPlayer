@@ -20,6 +20,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 import com.khjxiaogu.MCMidi.Midi.NoteInfo;
 import com.khjxiaogu.MCMidi.Midi.NotePlayers;
@@ -36,7 +37,10 @@ public class MCMidi extends JavaPlugin {
 		if (args.length == 0) {
 			sender.sendMessage(Messages.getString("MCMidi.help0")); //$NON-NLS-1$
 			sender.sendMessage(Messages.getString("MCMidi.help1")); //$NON-NLS-1$
+			sender.sendMessage(Messages.getString("MCMidi.help1_1")); //$NON-NLS-1$
+			sender.sendMessage(Messages.getString("MCMidi.help1_2")); //$NON-NLS-1$
 			sender.sendMessage(Messages.getString("MCMidi.help2")); //$NON-NLS-1$
+			sender.sendMessage(Messages.getString("MCMidi.help2_1")); //$NON-NLS-1$
 			sender.sendMessage(Messages.getString("MCMidi.help3")); //$NON-NLS-1$
 			sender.sendMessage(Messages.getString("MCMidi.help4")); //$NON-NLS-1$
 			sender.sendMessage(Messages.getString("MCMidi.help5")); //$NON-NLS-1$
@@ -137,6 +141,24 @@ public class MCMidi extends JavaPlugin {
 				}
 				sender.sendMessage(mp.getInfo());
 				return true;
+			} else if (args[0].equals("generate")) { //$NON-NLS-1$
+				MidiSheet mp = loaded.get(args[1]);
+				if (mp == null) {
+					sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
+					return false;
+				}
+				if (!(sender instanceof Player)) {
+					sender.sendMessage(Messages.getString("MCMidi.must_be_player"));//$NON-NLS-1$
+					return false;
+				}
+				Player p=(Player) sender;
+				Vector dir=p.getLocation().getDirection();
+				if(args.length>=3) {
+					mp.placeBlock(p.getLocation(),new Vector(Math.round(dir.getX()),0,Math.round(dir.getZ())),Integer.parseInt(args[2]));
+				}else
+					mp.placeBlock(p.getLocation(),new Vector(Math.round(dir.getX()),0,Math.round(dir.getZ())));
+				sender.sendMessage(Messages.getString("MCMidi.generate_finish"));//$NON-NLS-1$
+				return true;
 			}
 		}
 		if (args.length >= 1) {
@@ -182,36 +204,37 @@ public class MCMidi extends JavaPlugin {
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		List<String> list = new ArrayList<>();
 		if (args.length == 1) {
-			list.add("load");
-			list.add("play");
-			list.add("loop");
-			list.add("stop");
-			list.add("info");
-			list.add("list");
+			list.add("load");//$NON-NLS-1$
+			list.add("play");//$NON-NLS-1$
+			list.add("loop");//$NON-NLS-1$
+			list.add("stop");//$NON-NLS-1$
+			list.add("info");//$NON-NLS-1$
+			list.add("list");//$NON-NLS-1$
+			list.add("generate");//$NON-NLS-1$
 			filterList(args[0], list);
 		} else if (args.length == 2) {
-			if (args[0].equals("load")) {
+			if (args[0].equals("load")) {//$NON-NLS-1$
 				list.addAll(Arrays.asList(getDataFolder().list((d, n) -> {
-					return !n.endsWith(".cfg");
+					return !n.endsWith(".cfg");//$NON-NLS-1$
 				})));
-			} else if (args[0].equals("play") || args[0].equals("loop")) {
+			} else if (args[0].equals("play") || args[0].equals("loop") || args[0].equals("generate")) {//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				list.addAll(loaded.keySet());
-			} else if (args[0].equals("stop"))
+			} else if (args[0].equals("stop"))//$NON-NLS-1$
 				return null;
-			else if (args[0].equals("info")) {
+			else if (args[0].equals("info")) {//$NON-NLS-1$
 				list.addAll(loaded.keySet());
 			}
 			filterList(args[1], list);
 		} else if (args.length == 3) {
-			if (args[0].equals("play") || args[0].equals("loop"))
+			if (args[0].equals("play") || args[0].equals("loop"))//$NON-NLS-1$ //$NON-NLS-2$
 				return null;
-			else if (args[0].equals("load")) {
-				list.add("0");
+			else if (args[0].equals("load")) {//$NON-NLS-1$
+				list.add("0"); //$NON-NLS-1$
 			}
 			filterList(args[2], list);
 		} else if (args.length == 4) {
-			if (args[0].equals("load")) {
-				list.add("1");
+			if (args[0].equals("load")) {//$NON-NLS-1$
+				list.add("1"); //$NON-NLS-1$
 			}
 			filterList(args[3], list);
 		}
@@ -232,7 +255,7 @@ public class MCMidi extends JavaPlugin {
 	public void onEnable() {
 		MCMidi.plugin = this;
 		NoteInfo.initNotes();
-		File cfg = new File(MCMidi.plugin.getDataFolder(), "data.yml");
+		File cfg = new File(MCMidi.plugin.getDataFolder(), "data.yml");//$NON-NLS-1$
 		if (cfg.exists()) {
 			try {
 				midifile.load(cfg);
@@ -241,7 +264,7 @@ public class MCMidi extends JavaPlugin {
 					for (String s : cs.getKeys(false)) {
 						try {
 							ConfigurationSection cur = cs.getConfigurationSection(s);
-							loaded.put((String) cur.get("name"), (MidiSheet) cur.get("midi"));
+							loaded.put((String) cur.get("name"), (MidiSheet) cur.get("midi"));//$NON-NLS-1$ //$NON-NLS-2$
 						} catch (Throwable t) {
 							getLogger().info("midi " + s + " load failure");//$NON-NLS-1$ //$NON-NLS-2$
 						}
@@ -259,13 +282,14 @@ public class MCMidi extends JavaPlugin {
 		MCMidi.plugin = this;
 		ConfigurationSection cs = midifile.createSection("midi");//$NON-NLS-1$
 		int i = 0;
-		loaded.forEach((n, m) -> {
+		for(Map.Entry<String,MidiSheet> entry:loaded.entrySet()) {
 			ConfigurationSection cur = cs.createSection(Integer.toString(i));
-			cur.set("name", n);
-			cur.set("midi", m);
-		});
+			cur.set("name", entry.getKey());//$NON-NLS-1$
+			cur.set("midi", entry.getValue());//$NON-NLS-1$
+			i++;
+		}
 		try {
-			midifile.save(new File(MCMidi.plugin.getDataFolder(), "data.yml"));
+			midifile.save(new File(MCMidi.plugin.getDataFolder(), "data.yml"));//$NON-NLS-1$
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

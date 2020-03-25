@@ -4,8 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.bukkit.Instrument;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Note;
 import org.bukkit.Note.Tone;
+import org.bukkit.block.Block;
+import org.bukkit.block.NoteBlock;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 
@@ -39,7 +43,7 @@ public class NoteInfo implements ConfigurationSerializable {
 			NoteInfo.inss[1] = Instrument.BASS_GUITAR;
 			NoteInfo.inss[0] = Instrument.BASS_GUITAR;
 			NoteInfo.init = (t, k) -> {
-				t.n = NoteInfo.notes[k % 12];
+				t.n = NoteInfo.notes[k % 12+6];
 				t.ins = NoteInfo.inss[k / 12];
 			};
 		} else {
@@ -60,6 +64,7 @@ public class NoteInfo implements ConfigurationSerializable {
 			NoteInfo.inss[1] = Instrument.BASS_DRUM;
 			NoteInfo.inss[0] = Instrument.BASS_DRUM;
 			NoteInfo.init = (t, k) -> {
+				k+=6;
 				t.n = NoteInfo.notes[k % 24];
 				t.ins = NoteInfo.inss[k / 12];
 			};
@@ -117,7 +122,11 @@ public class NoteInfo implements ConfigurationSerializable {
 			p.playNote(p.getLocation(), ins, n);
 		}
 	}
-
+	public void play(NoteBlock b) {
+		if (n != null) {
+			b.play(ins, n);
+		}
+	}
 	@Override
 	public Map<String, Object> serialize() {
 		Map<String, Object> map = new HashMap<>();
@@ -125,5 +134,23 @@ public class NoteInfo implements ConfigurationSerializable {
 		map.put("t", ticks);
 		map.put("v", volume);
 		return map;
+	}
+	public void placeBlock(Location l) {
+		Block b=l.getWorld().getBlockAt(l);
+		Block under=l.getWorld().getBlockAt(l.getBlockX(),l.getBlockY()-1,l.getBlockZ());
+		l.getWorld().getBlockAt(l.getBlockX(),l.getBlockY()-2,l.getBlockZ()).setType(Material.STONE);
+		switch(ins) {
+		case BASS_DRUM:under.setType(Material.STONE);break;
+		case STICKS:under.setType(Material.GLASS);break;
+		case PIANO:under.setType(Material.IRON_BLOCK);break;
+		case SNARE_DRUM:under.setType(Material.SAND);break;
+		case BASS_GUITAR:under.setType(Material.WOOD);break;
+		default:under.setType(Material.GOLD_BLOCK);break;
+		}
+		b.setType(Material.NOTE_BLOCK);
+		NoteBlock nb=(NoteBlock) b.getState();
+		nb.setNote(n);
+		nb.update();
+		//b.setData(n.getId());
 	}
 }
