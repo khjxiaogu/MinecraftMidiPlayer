@@ -11,6 +11,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.sound.midi.InvalidMidiDataException;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.NoteBlock;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -22,14 +26,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
+import com.khjxiaogu.MCMidi.Midi.NoteBlockPlayers;
 import com.khjxiaogu.MCMidi.Midi.NoteInfo;
 import com.khjxiaogu.MCMidi.Midi.NotePlayers;
 import com.khjxiaogu.MCMidi.Midi.NoteTrack;
+import com.khjxiaogu.MCMidi.api.MidiAPI;
 
 public class MCMidi extends JavaPlugin {
 	public static MCMidi plugin;
 	public Map<String, MidiSheet> loaded = new ConcurrentHashMap<>();
-	Map<Player, NotePlayers> nps = new ConcurrentHashMap<>();
+	public Map<Player, NotePlayers> nps = new ConcurrentHashMap<>();
+	public Map<Location, NoteBlockPlayers> nbs = new ConcurrentHashMap<>();
 	FileConfiguration midifile = new YamlConfiguration();
 
 	@Override
@@ -104,7 +111,31 @@ public class MCMidi extends JavaPlugin {
 				sender.sendMessage(Messages.getString("MCMidi.play_start")); //$NON-NLS-1$
 				p.sendMessage(Messages.getString("MCMidi.play_name_start") + args[1]); //$NON-NLS-1$
 				return true;
-			} else if (args[0].equals("loop")) { //$NON-NLS-1$
+			} else if (args[0].equals("loopblock")) { //$NON-NLS-1$
+				Player p;
+				if (sender instanceof Player) {
+					p = (Player) sender;
+				} else {
+					sender.sendMessage(Messages.getString("MCMidi.must_be_player"));//$NON-NLS-1$
+					return false;
+				}
+				Location l=new Location(p.getWorld(),Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]));
+				NoteBlockPlayers np = nbs.get(l);
+				if (np != null) {
+					np.cancel();
+				}
+				MidiSheet mp = loaded.get(args[1]);
+				if (mp == null) {
+					sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
+					return false;
+				}
+				Block ob=l.getBlock();
+				if(ob==null||ob.getType()!=Material.NOTE_BLOCK)
+					return false;
+				nbs.put(l, mp.playBlock((NoteBlock)ob.getState(),true));
+				sender.sendMessage(Messages.getString("MCMidi.play_start")); //$NON-NLS-1$
+				return true;
+			}else if (args[0].equals("loop")) { //$NON-NLS-1$
 				Player p;
 				if (args.length >= 3) {
 					p = Bukkit.getPlayer(args[2]);
@@ -142,24 +173,21 @@ public class MCMidi extends JavaPlugin {
 				sender.sendMessage(mp.getInfo());
 				return true;
 			} else if (args[0].equals("generate")) { //$NON-NLS-1$
-				MidiSheet mp = loaded.get(args[1]);
-				if (mp == null) {
-					sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
-					return false;
-				}
 				if (!(sender instanceof Player)) {
 					sender.sendMessage(Messages.getString("MCMidi.must_be_player"));//$NON-NLS-1$
 					return false;
 				}
 				Player p=(Player) sender;
-				Vector dir=p.getLocation().getDirection();
-				if(args.length>=3) {
-					mp.placeBlock(p.getLocation(),new Vector(Math.round(dir.getX()),0,Math.round(dir.getZ())),Integer.parseInt(args[2]));
-				}else
-					mp.placeBlock(p.getLocation(),new Vector(Math.round(dir.getX()),0,Math.round(dir.getZ())));
+				int width=24;
+				if(args.length>=3)
+					width=Integer.parseInt(args[2]);
+				if (!MidiAPI.generateStucture(args[1],p.getLocation(), width)) {
+					sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
+					return false;
+				}
 				sender.sendMessage(Messages.getString("MCMidi.generate_finish"));//$NON-NLS-1$
 				return true;
-			}
+			} 
 		}
 		if (args.length >= 1) {
 			if (args[0].equals("stop")) { //$NON-NLS-1$
@@ -215,9 +243,9 @@ public class MCMidi extends JavaPlugin {
 		} else if (args.length == 2) {
 			if (args[0].equals("load")) {//$NON-NLS-1$
 				list.addAll(Arrays.asList(getDataFolder().list((d, n) -> {
-					return !n.endsWith(".cfg");//$NON-NLS-1$
+					return !n.endsWith(".yml");//$NON-NLS-1$
 				})));
-			} else if (args[0].equals("play") || args[0].equals("loop") || args[0].equals("generate")) {//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			} else if (args[0].equals("play") || args[0].equals("loop") || args[0].equals("generate") || args[0].equals("loopblock")) {//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				list.addAll(loaded.keySet());
 			} else if (args[0].equals("stop"))//$NON-NLS-1$
 				return null;

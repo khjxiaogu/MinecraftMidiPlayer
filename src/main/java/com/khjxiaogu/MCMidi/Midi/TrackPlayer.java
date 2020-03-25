@@ -37,7 +37,12 @@ public class TrackPlayer {
 	public void cancel() {
 		canceled = true;
 	}
-
+	public void play(NoteInfo note) {
+		note.play(p);
+	}
+	public boolean canPlay() {
+		return p.isValid() && p.isOnline();
+	}
 	public void play() {
 		if (canceled)
 			return;
@@ -54,11 +59,11 @@ public class TrackPlayer {
 			return;
 		}
 		if (index > 0) {
-			nc.notes.get(index).play(p);
+			play(nc.notes.get(index));
 		}
 		index++;
 		while (index < nc.notes.size() && nc.notes.get(index).ticks == curticks) {
-			nc.notes.get(index).play(p);
+			play(nc.notes.get(index));
 			index++;
 		}
 		if (index >= nc.notes.size()) {
@@ -73,10 +78,10 @@ public class TrackPlayer {
 		new BukkitRunnable() {
 			@Override
 			public void run() {
-				if (p.isValid() && p.isOnline()) {
+				if (canPlay()) {
 					play();
 				}
 			}
-		}.runTaskLaterAsynchronously(MCMidi.plugin, wait);
+		}.runTaskLater(MCMidi.plugin, wait);
 	}
 }

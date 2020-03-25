@@ -18,10 +18,12 @@ import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
 import org.bukkit.Location;
+import org.bukkit.block.NoteBlock;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import com.khjxiaogu.MCMidi.Midi.NoteBlockPlayers;
 import com.khjxiaogu.MCMidi.Midi.NotePlayers;
 import com.khjxiaogu.MCMidi.Midi.NoteTrack;
 
@@ -108,7 +110,9 @@ public class MidiSheet implements ConfigurationSerializable {
 	public NotePlayers playFor(Player p, boolean loop) {
 		return new NotePlayers(p, this, loop);
 	}
-
+	public NoteBlockPlayers playBlock(NoteBlock nb, boolean loop) {
+		return new NoteBlockPlayers(nb, this, loop);
+	}
 	public String getInfo() {
 		StringBuilder sb = new StringBuilder("Tracks Info:\n");
 		for (int i = 0; i < tracks.size(); i++) {

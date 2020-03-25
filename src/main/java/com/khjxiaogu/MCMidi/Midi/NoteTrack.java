@@ -10,6 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.NoteBlock;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.material.Diode;
@@ -44,7 +45,11 @@ public class NoteTrack implements ConfigurationSerializable {
 		ret.play();
 		return ret;
 	}
-
+	public NoteBlockPlayer playAll(NoteBlock nb) {
+		NoteBlockPlayer ret = new NoteBlockPlayer(nb, this);
+		ret.play();
+		return ret;
+	}
 	public int getSize() {
 		return notes.size();
 	}
@@ -166,7 +171,6 @@ public class NoteTrack implements ConfigurationSerializable {
 			if((currentWidth<clw-1)&&(notes.size()<=i||Math.round(notes.get(i).ticks/2)-curticks<=4)) {// compress (place redstone only when needed)
 				world.getBlockAt(direct.getBlockX(),direct.getBlockY()-1,direct.getBlockZ()).setType(Material.STONE);
 				world.getBlockAt(direct).setType(Material.REDSTONE_WIRE);
-				
 				direct.add(forward);
 				currentWidth++;
 			}
