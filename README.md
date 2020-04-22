@@ -1,4 +1,5 @@
-# Minecraft Midi Player
+# Minecraft Midi Player   
+[简体中文](#minecraft-midi%E6%92%AD%E6%94%BE%E5%99%A8)  
 a simple plugin to play midi in your minecraft server!   
 Minecraft version: 1.8.1+   
 Recommend using with Piano+ resource pack.  
