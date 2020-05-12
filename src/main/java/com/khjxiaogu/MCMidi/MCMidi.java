@@ -46,6 +46,8 @@ public class MCMidi extends JavaPlugin {
 			sender.sendMessage(Messages.getString("MCMidi.help1")); //$NON-NLS-1$
 			sender.sendMessage(Messages.getString("MCMidi.help1_1")); //$NON-NLS-1$
 			sender.sendMessage(Messages.getString("MCMidi.help1_2")); //$NON-NLS-1$
+			sender.sendMessage(Messages.getString("MCMidi.help1_3")); //$NON-NLS-1$
+			sender.sendMessage(Messages.getString("MCMidi.help1_4")); //$NON-NLS-1$
 			sender.sendMessage(Messages.getString("MCMidi.help2")); //$NON-NLS-1$
 			sender.sendMessage(Messages.getString("MCMidi.help2_1")); //$NON-NLS-1$
 			sender.sendMessage(Messages.getString("MCMidi.help3")); //$NON-NLS-1$
@@ -82,6 +84,17 @@ public class MCMidi extends JavaPlugin {
 					e.printStackTrace();
 					return false;
 				}
+			}else if (args[0].equals("combine")) { //$NON-NLS-1$
+				MidiSheet mp = loaded.get(args[1]);
+				if (mp == null) {
+					sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
+					return false;
+				}
+				if(mp.Combine())
+					sender.sendMessage(Messages.getString("MCMidi.combined"));
+				else
+					sender.sendMessage(Messages.getString("MCMidi.already_combined"));
+				return true;
 			} else if (args[0].equals("play")) { //$NON-NLS-1$
 				Player p;
 				if (args.length >= 3) {

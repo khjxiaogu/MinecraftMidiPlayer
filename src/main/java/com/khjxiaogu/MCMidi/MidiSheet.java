@@ -87,7 +87,7 @@ public class MidiSheet implements ConfigurationSerializable {
 	}
 	public void placeBlock(Location start,Vector direction) {
 		Location cur=start.clone();
-		NoteTrack Combined=new NoteTrack();;
+		NoteTrack Combined=new NoteTrack();
 		for(NoteTrack t:tracks) {
 			Combined.addAll(t);
 		}
@@ -102,6 +102,18 @@ public class MidiSheet implements ConfigurationSerializable {
 		}
 		Combined.sort();
 		Combined.placeBlock(cur, direction,width);
+	}
+	public boolean Combine() {
+		if(tracks.size()==1)
+			return false;
+		NoteTrack Combined=new NoteTrack();;
+		for(NoteTrack t:tracks) {
+			Combined.addAll(t);
+		}
+		Combined.sort();
+		tracks.clear();
+		tracks.add(Combined);
+		return true;
 	}
 	public NotePlayers playFor(Player p) {
 		return new NotePlayers(p, this);
