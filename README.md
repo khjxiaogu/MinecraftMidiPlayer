@@ -25,6 +25,9 @@ Recommend using with Piano+ resource pack.
 适用于minecraft服务器的midi插件   
 Minecraft版本：1.8.1+   
 建议与Piano+资源包一起食用。  
+[Piano+ 1.6+](https://drive.google.com/file/d/0B6nFdqZCyZZ2dTdTa2lQZnZQdWM/edit?usp=sharing)   
+[Piano+ 1.9-1.12](https://www.mediafire.com/file/zbawlf4ae3ukrbf/Piano++(1.12).7z)   
+[Piano+ 1.13+](https://www.mediafire.com/file/u7rkappl54nc03d/Piano++(1.13).7z)   
 # 用法  
 0. 在[Releases](https://github.com/khjxiaogu/MinecraftMidiPlayer/releases)下载本插件的最新版本。   
 1. 把本插件放在插件文件夹(服务器目录/plugins/)。    
