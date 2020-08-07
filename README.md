@@ -2,7 +2,8 @@
 [简体中文](#minecraft-midi%E6%92%AD%E6%94%BE%E5%99%A8)  
 a simple plugin to play midi in your minecraft server!   
 Minecraft version: 1.8.1+   
-Recommend using with Piano+ resource pack.  
+Can map notes to several instruments, creating a note range from A0 to C7(1.8+)or even A0 to C9(1.12+), nearly all midi notes are supported in 1.12+(midi supports from A0 to G#9).  
+Also compatible with Piano+ resource pack, creating a note range from C1 to C7, only thing to do is to set config item "universal" in "plugin.yml" to false.  
 [Piano+ 1.6+](https://drive.google.com/file/d/0B6nFdqZCyZZ2dTdTa2lQZnZQdWM/edit?usp=sharing)   
 [Piano+ 1.9-1.12](https://www.mediafire.com/file/zbawlf4ae3ukrbf/Piano++(1.12).7z)   
 [Piano+ 1.13+](https://www.mediafire.com/file/u7rkappl54nc03d/Piano++(1.13).7z)   
@@ -24,7 +25,8 @@ Recommend using with Piano+ resource pack.
 # Minecraft midi播放器   
 适用于minecraft服务器的midi插件   
 Minecraft版本：1.8.1+   
-建议与Piano+资源包一起食用。  
+可以把音高映射到不同的乐器，支持从A0到C7(1.8以后)甚至从A0到C9(1.12以后)的音高，1.12以后的版本几乎所有的midi音高都支持播放了（midi仅支持从A0到G#9的音高）。  
+支持Piano+资源包，支持C1到C7的音高，只需要设置"config.yml"里的"universal"为false即可。  
 [Piano+ 1.6+](https://drive.google.com/file/d/0B6nFdqZCyZZ2dTdTa2lQZnZQdWM/edit?usp=sharing)   
 [Piano+ 1.9-1.12](https://www.mediafire.com/file/zbawlf4ae3ukrbf/Piano++(1.12).7z)   
 [Piano+ 1.13+](https://www.mediafire.com/file/u7rkappl54nc03d/Piano++(1.13).7z)   
