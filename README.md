@@ -19,9 +19,9 @@ Also compatible with Piano+ resource pack, creating a note range from C1 to C7, 
 - Server tps may affect play speed.
 - Midi files that are too fast may have some notes lost, the smallest time unit is a minecraft tick(50ms), notes closer than this may be considered as notes at the same moment.  
 - The velocity,pressure or volume of a single key would not be considered as there's no way to present this in minecraft.  
-- Only midi speed change message and key press messages would take effect.  
+- Only midi speed change message and key on messages would take effect.  
 - generating structure may cause performance issues. There's no undo, so be careful!
-- structure width must larger than 10, you can calculate a approxmate value by lengthInTicks*3(cell width)/250(height).
+- structure width must larger than 16, you can calculate a approxmate value by lengthInTicks*3(cell width)/250(height).
 # Minecraft midi播放器   
 适用于minecraft服务器的midi插件   
 Minecraft版本：1.8.1+   
