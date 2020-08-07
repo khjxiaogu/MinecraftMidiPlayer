@@ -30,7 +30,8 @@ import com.khjxiaogu.MCMidi.Midi.NoteTrack;
 
 public class MidiSheet implements ConfigurationSerializable {
 	public List<NoteTrack> tracks = new ArrayList<>();
-	private static int MsPerGameTick=50;
+	private static int MsPerGameTick = 50;
+
 	public MidiSheet(File f, int offset, float speed) throws InvalidMidiDataException, IOException {
 		Sequence sequence;
 		sequence = MidiSystem.getSequence(f);
@@ -50,48 +51,51 @@ public class MidiSheet implements ConfigurationSerializable {
 			} else {
 				millisPerMidiTick = 1000 / resolution / framesPerSecond / speed;
 			}
-			//int b = 0;
+			// int b = 0;
 			if (track.size() > 0) {
 				for (int i = 0; i < track.size(); i++) {
-					
 
-					
 					MidiEvent event = track.get(i);
 					MidiMessage message = event.getMessage();
-					/*if (message instanceof MetaMessage) {
-						StringBuilder logsb=new StringBuilder(message.getClass().getSimpleName()).append(":");
-						byte[] msg=message.getMessage();
-						int status=message.getStatus();
-						
-						logsb.append(status).append(",");
-						logsb.append(((MetaMessage) message).getType()).append(",");
-						for(int ki=0;ki<msg.length;ki++) {
-							logsb.append(Integer.toHexString(Math.abs(msg[ki]))).append("-");
-						}
-						System.out.println(logsb.toString());
-					}*/
+					/*
+					 * if (message instanceof MetaMessage) {
+					 * StringBuilder logsb=new
+					 * StringBuilder(message.getClass().getSimpleName()).append(":");
+					 * byte[] msg=message.getMessage();
+					 * int status=message.getStatus();
+					 * 
+					 * logsb.append(status).append(",");
+					 * logsb.append(((MetaMessage) message).getType()).append(",");
+					 * for(int ki=0;ki<msg.length;ki++) {
+					 * logsb.append(Integer.toHexString(Math.abs(msg[ki]))).append("-");
+					 * }
+					 * System.out.println(logsb.toString());
+					 * }
+					 */
 					if (message instanceof ShortMessage) {
 						ShortMessage sm = (ShortMessage) message;
-						if ((sm.getCommand()&0x90)>0) {// Detect KEY_ON message
+						if ((sm.getCommand() & 0x90) > 0) {// Detect KEY_ON message
 							currentTrack.add(sm.getData1() + offset * 12,
 									Math.round(event.getTick() * millisPerMidiTick / MsPerGameTick), sm.getData2());
-							/*if(b==20) {
-								System.out.println(event.getTick());
-							}
-							b++;*/
+							/*
+							 * if(b==20) {
+							 * System.out.println(event.getTick());
+							 * }
+							 * b++;
+							 */
 						}
 					} else if (message instanceof MetaMessage) {
 						MetaMessage metaMessage = (MetaMessage) message;
-						if (metaMessage.getStatus() == 0xff ) {
-							if(metaMessage.getType() == 0x51) {// Detect tempo change
+						if (metaMessage.getStatus() == 0xff) {
+							if (metaMessage.getType() == 0x51) {// Detect tempo change
 								long microsPerBeat = 0;
-								
+
 								byte[] byteData = metaMessage.getData();
 								for (int j = 0; j < byteData.length; j++) {
 									microsPerBeat *= 0x100;
 									microsPerBeat += Byte.toUnsignedInt(byteData[j]);
 								}
-								//System.out.println(microsPerBeat);
+								// System.out.println(microsPerBeat);
 								if (microsPerBeat != 0) {
 									beatsPerMinute = 60000000 / microsPerBeat;
 								}
@@ -100,7 +104,7 @@ public class MidiSheet implements ConfigurationSerializable {
 								} else {
 									millisPerMidiTick = 1000 / resolution / framesPerSecond / speed;
 								}
-								//b=0;
+								// b=0;
 							}
 						}
 					}
@@ -111,33 +115,39 @@ public class MidiSheet implements ConfigurationSerializable {
 			}
 		}
 	}
+
 	@SuppressWarnings("unchecked")
 	public MidiSheet(Map<String, Object> map) {
 		tracks.addAll((Collection<NoteTrack>) map.get("tracks"));
 	}
-	public void placeBlock(Location start,Vector direction,Material base) {
-		Location cur=start.clone();
-		NoteTrack Combined=new NoteTrack();
-		for(NoteTrack t:tracks) {
+
+	public void placeBlock(Location start, Vector direction, Material base) {
+		Location cur = start.clone();
+		NoteTrack Combined = new NoteTrack();
+		for (NoteTrack t : tracks) {
 			Combined.addAll(t);
 		}
 		Combined.sort();
-		Combined.placeBlock(cur, direction,24,base);
+		Combined.placeBlock(cur, direction, 24, base);
 	}
-	public void placeBlock(Location start,Vector direction,final int width,Material base) {
-		Location cur=start.clone();
-		NoteTrack Combined=new NoteTrack();;
-		for(NoteTrack t:tracks) {
+
+	public void placeBlock(Location start, Vector direction, final int width, Material base) {
+		Location cur = start.clone();
+		NoteTrack Combined = new NoteTrack();
+		;
+		for (NoteTrack t : tracks) {
 			Combined.addAll(t);
 		}
 		Combined.sort();
-		Combined.placeBlock(cur, direction,width,base);
+		Combined.placeBlock(cur, direction, width, base);
 	}
+
 	public boolean Combine() {
-		if(tracks.size()==1)
+		if (tracks.size() == 1)
 			return false;
-		NoteTrack Combined=new NoteTrack();;
-		for(NoteTrack t:tracks) {
+		NoteTrack Combined = new NoteTrack();
+		;
+		for (NoteTrack t : tracks) {
 			Combined.addAll(t);
 		}
 		Combined.sort();
@@ -145,6 +155,7 @@ public class MidiSheet implements ConfigurationSerializable {
 		tracks.add(Combined);
 		return true;
 	}
+
 	public NotePlayers playFor(Player p) {
 		return new NotePlayers(p, this);
 	}
@@ -152,9 +163,11 @@ public class MidiSheet implements ConfigurationSerializable {
 	public NotePlayers playFor(Player p, boolean loop) {
 		return new NotePlayers(p, this, loop);
 	}
+
 	public NoteBlockPlayers playBlock(NoteBlock nb, boolean loop) {
 		return new NoteBlockPlayers(nb, this, loop);
 	}
+
 	public String getInfo() {
 		StringBuilder sb = new StringBuilder("Tracks Info:\n");
 		for (int i = 0; i < tracks.size(); i++) {

@@ -26,8 +26,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.util.Vector;
-
 import com.khjxiaogu.MCMidi.Midi.NoteBlockPlayers;
 import com.khjxiaogu.MCMidi.Midi.NoteInfo;
 import com.khjxiaogu.MCMidi.Midi.NotePlayers;
@@ -86,13 +84,13 @@ public class MCMidi extends JavaPlugin {
 					e.printStackTrace();
 					return false;
 				}
-			}else if (args[0].equals("combine")) { //$NON-NLS-1$
+			} else if (args[0].equals("combine")) { //$NON-NLS-1$
 				MidiSheet mp = loaded.get(args[1]);
 				if (mp == null) {
 					sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
 					return false;
 				}
-				if(mp.Combine())
+				if (mp.Combine())
 					sender.sendMessage(Messages.getString("MCMidi.combined"));
 				else
 					sender.sendMessage(Messages.getString("MCMidi.already_combined"));
@@ -129,15 +127,16 @@ public class MCMidi extends JavaPlugin {
 			} else if (args[0].equals("loopblock")) { //$NON-NLS-1$
 				World w;
 				if (sender instanceof Player) {
-					w= ((Player) sender).getWorld();
-				} else if(sender instanceof BlockCommandSender){
-					w=(( BlockCommandSender)sender).getBlock().getWorld();
-					
-				}else {
+					w = ((Player) sender).getWorld();
+				} else if (sender instanceof BlockCommandSender) {
+					w = ((BlockCommandSender) sender).getBlock().getWorld();
+
+				} else {
 					sender.sendMessage(Messages.getString("MCMidi.must_be_player"));//$NON-NLS-1$
 					return false;
 				}
-				Location l=new Location(w,Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]));
+				Location l = new Location(w, Integer.parseInt(args[2]), Integer.parseInt(args[3]),
+						Integer.parseInt(args[4]));
 				NoteBlockPlayers np = nbs.get(l);
 				if (np != null) {
 					np.cancel();
@@ -147,24 +146,25 @@ public class MCMidi extends JavaPlugin {
 					sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
 					return false;
 				}
-				Block ob=l.getBlock();
-				if(ob==null||ob.getType()!=Material.NOTE_BLOCK)
+				Block ob = l.getBlock();
+				if (ob == null || ob.getType() != Material.NOTE_BLOCK)
 					return false;
-				nbs.put(l, mp.playBlock((NoteBlock)ob.getState(),true));
+				nbs.put(l, mp.playBlock((NoteBlock) ob.getState(), true));
 				sender.sendMessage(Messages.getString("MCMidi.play_start")); //$NON-NLS-1$
 				return true;
 			} else if (args[0].equals("playblock")) { //$NON-NLS-1$
 				World w;
 				if (sender instanceof Player) {
-					w= ((Player) sender).getWorld();
-				} else if(sender instanceof BlockCommandSender){
-					w=(( BlockCommandSender)sender).getBlock().getWorld();
-					
-				}else {
+					w = ((Player) sender).getWorld();
+				} else if (sender instanceof BlockCommandSender) {
+					w = ((BlockCommandSender) sender).getBlock().getWorld();
+
+				} else {
 					sender.sendMessage(Messages.getString("MCMidi.must_be_player"));//$NON-NLS-1$
 					return false;
 				}
-				Location l=new Location(w,Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]));
+				Location l = new Location(w, Integer.parseInt(args[2]), Integer.parseInt(args[3]),
+						Integer.parseInt(args[4]));
 				NoteBlockPlayers np = nbs.get(l);
 				if (np != null) {
 					np.cancel();
@@ -174,13 +174,13 @@ public class MCMidi extends JavaPlugin {
 					sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
 					return false;
 				}
-				Block ob=l.getBlock();
-				if(ob==null||ob.getType()!=Material.NOTE_BLOCK)
+				Block ob = l.getBlock();
+				if (ob == null || ob.getType() != Material.NOTE_BLOCK)
 					return false;
-				nbs.put(l, mp.playBlock((NoteBlock)ob.getState(),false));
+				nbs.put(l, mp.playBlock((NoteBlock) ob.getState(), false));
 				sender.sendMessage(Messages.getString("MCMidi.play_start")); //$NON-NLS-1$
 				return true;
-			}else if (args[0].equals("loop")) { //$NON-NLS-1$
+			} else if (args[0].equals("loop")) { //$NON-NLS-1$
 				Player p;
 				if (args.length >= 3) {
 					p = Bukkit.getPlayer(args[2]);
@@ -222,20 +222,20 @@ public class MCMidi extends JavaPlugin {
 					sender.sendMessage(Messages.getString("MCMidi.must_be_player"));//$NON-NLS-1$
 					return false;
 				}
-				Player p=(Player) sender;
-				int width=24;
-				Material type=Material.STONE;
-				if(args.length>=3)
-					type=Material.getMaterial(Integer.valueOf(args[2]));
-				if(args.length>=4)
-					width=Integer.parseInt(args[3]);
-				if (!MidiAPI.generateStucture(args[1],p.getLocation(), width,type)) {
+				Player p = (Player) sender;
+				int width = 24;
+				Material type = Material.STONE;
+				if (args.length >= 3)
+					type = Material.getMaterial(Integer.valueOf(args[2]));
+				if (args.length >= 4)
+					width = Integer.parseInt(args[3]);
+				if (!MidiAPI.generateStucture(args[1], p.getLocation(), width, type)) {
 					sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
 					return false;
 				}
 				sender.sendMessage(Messages.getString("MCMidi.generate_finish"));//$NON-NLS-1$
 				return true;
-			} 
+			}
 		}
 		if (args.length >= 1) {
 			if (args[0].equals("stop")) { //$NON-NLS-1$
@@ -293,7 +293,8 @@ public class MCMidi extends JavaPlugin {
 				list.addAll(Arrays.asList(getDataFolder().list((d, n) -> {
 					return !n.endsWith(".yml");//$NON-NLS-1$
 				})));
-			} else if (args[0].equals("play") || args[0].equals("loop") || args[0].equals("generate") || args[0].equals("loopblock") || args[0].equals("playblock")) {//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			} else if (args[0].equals("play") || args[0].equals("loop") || args[0].equals("generate") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+					|| args[0].equals("loopblock") || args[0].equals("playblock")) {
 				list.addAll(loaded.keySet());
 			} else if (args[0].equals("stop"))//$NON-NLS-1$
 				return null;
@@ -325,7 +326,7 @@ public class MCMidi extends JavaPlugin {
 		ConfigurationSerialization.registerClass(NoteInfo.class);
 		ConfigurationSerialization.registerClass(NoteTrack.class);
 		ConfigurationSerialization.registerClass(MidiSheet.class);
-		
+
 	}
 
 	@Override
@@ -341,7 +342,7 @@ public class MCMidi extends JavaPlugin {
 					for (String s : cs.getKeys(false)) {
 						try {
 							ConfigurationSection cur = cs.getConfigurationSection(s);
-							getLogger().info("loading"+cur.getString("name"));
+							getLogger().info("loading" + cur.getString("name"));
 							loaded.put(cur.getString("name"), (MidiSheet) cur.get("midi"));//$NON-NLS-1$ //$NON-NLS-2$
 						} catch (Throwable t) {
 							getLogger().info("midi " + s + " load failure");//$NON-NLS-1$ //$NON-NLS-2$
@@ -361,7 +362,7 @@ public class MCMidi extends JavaPlugin {
 		MCMidi.plugin = this;
 		ConfigurationSection cs = midifile.createSection("midi");//$NON-NLS-1$
 		int i = 0;
-		for(Map.Entry<String,MidiSheet> entry:loaded.entrySet()) {
+		for (Map.Entry<String, MidiSheet> entry : loaded.entrySet()) {
 			ConfigurationSection cur = cs.createSection(Integer.toString(i));
 			cur.set("name", entry.getKey());//$NON-NLS-1$
 			cur.set("midi", entry.getValue());//$NON-NLS-1$

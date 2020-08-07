@@ -31,27 +31,8 @@ public class NoteInfo implements ConfigurationSerializable {
 	private final int key;
 
 	public static void initNotes() {
-		if (!MCMidi.plugin.getConfig().getBoolean("universal", false)) {
-			for(int i=24;i>=10;i--) {
-				NoteInfo.inss[i] = Instrument.BASS_DRUM;
-			}
-			
-			NoteInfo.inss[9] = Instrument.BASS_DRUM;
-			NoteInfo.inss[8] = Instrument.BASS_DRUM;
-			NoteInfo.inss[7] = Instrument.BASS_DRUM;
-			NoteInfo.inss[6] = Instrument.STICKS;
-			NoteInfo.inss[5] = Instrument.PIANO;
-			NoteInfo.inss[4] = Instrument.SNARE_DRUM;
-			NoteInfo.inss[3] = Instrument.BASS_GUITAR;
-			NoteInfo.inss[2] = Instrument.BASS_GUITAR;
-			NoteInfo.inss[1] = Instrument.BASS_GUITAR;
-			NoteInfo.inss[0] = Instrument.BASS_GUITAR;
-			NoteInfo.init = (t, k) -> {
-				t.n = NoteInfo.notes[k % 12+6];
-				t.ins = NoteInfo.inss[k / 12];
-			};
-		} else {
-			for(int i=24;i>=10;i--) {
+		if (MCMidi.plugin.getConfig().getBoolean("universal", false)) {
+			for (int i = 24; i >= 10; i--) {
 				NoteInfo.inss[i] = Instrument.SNARE_DRUM;
 			}
 			NoteInfo.inss[9] = Instrument.SNARE_DRUM;
@@ -71,8 +52,27 @@ public class NoteInfo implements ConfigurationSerializable {
 			NoteInfo.inss[1] = Instrument.BASS_DRUM;
 			NoteInfo.inss[0] = Instrument.BASS_DRUM;
 			NoteInfo.init = (t, k) -> {
-				k+=6;
+				k += 6;
 				t.n = NoteInfo.notes[k % 24];
+				t.ins = NoteInfo.inss[k / 12];
+			};
+		} else {
+			for (int i = 24; i >= 10; i--) {
+				NoteInfo.inss[i] = Instrument.BASS_DRUM;
+			}
+
+			NoteInfo.inss[9] = Instrument.BASS_DRUM;
+			NoteInfo.inss[8] = Instrument.BASS_DRUM;
+			NoteInfo.inss[7] = Instrument.BASS_DRUM;
+			NoteInfo.inss[6] = Instrument.STICKS;
+			NoteInfo.inss[5] = Instrument.PIANO;
+			NoteInfo.inss[4] = Instrument.SNARE_DRUM;
+			NoteInfo.inss[3] = Instrument.BASS_GUITAR;
+			NoteInfo.inss[2] = Instrument.BASS_GUITAR;
+			NoteInfo.inss[1] = Instrument.BASS_GUITAR;
+			NoteInfo.inss[0] = Instrument.BASS_GUITAR;
+			NoteInfo.init = (t, k) -> {
+				t.n = NoteInfo.notes[k % 12 + 6];
 				t.ins = NoteInfo.inss[k / 12];
 			};
 		}
@@ -129,11 +129,13 @@ public class NoteInfo implements ConfigurationSerializable {
 			p.playNote(p.getLocation(), ins, n);
 		}
 	}
+
 	public void play(NoteBlock b) {
 		if (n != null) {
 			b.play(ins, n);
 		}
 	}
+
 	@Override
 	public Map<String, Object> serialize() {
 		Map<String, Object> map = new HashMap<>();
@@ -142,22 +144,35 @@ public class NoteInfo implements ConfigurationSerializable {
 		map.put("v", volume);
 		return map;
 	}
-	public void placeBlock(Location l,Material base) {
-		Block b=l.getWorld().getBlockAt(l);
-		Block under=l.getWorld().getBlockAt(l.getBlockX(),l.getBlockY()-1,l.getBlockZ());
-		l.getWorld().getBlockAt(l.getBlockX(),l.getBlockY()-2,l.getBlockZ()).setType(base);
-		switch(ins) {
-		case BASS_DRUM:under.setType(Material.STONE);break;
-		case STICKS:under.setType(Material.GLASS);break;
-		case PIANO:under.setType(Material.IRON_BLOCK);break;
-		case SNARE_DRUM:under.setType(Material.SAND);break;
-		case BASS_GUITAR:under.setType(Material.WOOD);break;
-		default:under.setType(Material.GOLD_BLOCK);break;
+
+	public void placeBlock(Location l, Material base) {
+		Block b = l.getWorld().getBlockAt(l);
+		Block under = l.getWorld().getBlockAt(l.getBlockX(), l.getBlockY() - 1, l.getBlockZ());
+		l.getWorld().getBlockAt(l.getBlockX(), l.getBlockY() - 2, l.getBlockZ()).setType(base);
+		switch (ins) {
+		case BASS_DRUM:
+			under.setType(Material.STONE);
+			break;
+		case STICKS:
+			under.setType(Material.GLASS);
+			break;
+		case PIANO:
+			under.setType(Material.IRON_BLOCK);
+			break;
+		case SNARE_DRUM:
+			under.setType(Material.SAND);
+			break;
+		case BASS_GUITAR:
+			under.setType(Material.WOOD);
+			break;
+		default:
+			under.setType(Material.GOLD_BLOCK);
+			break;
 		}
 		b.setType(Material.NOTE_BLOCK);
-		NoteBlock nb=(NoteBlock) b.getState();
+		NoteBlock nb = (NoteBlock) b.getState();
 		nb.setNote(n);
 		nb.update();
-		//b.setData(n.getId());
+		// b.setData(n.getId());
 	}
 }

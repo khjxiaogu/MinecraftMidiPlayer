@@ -37,12 +37,15 @@ public class TrackPlayer {
 	public void cancel() {
 		canceled = true;
 	}
+
 	public void play(NoteInfo note) {
 		note.play(p);
 	}
+
 	public boolean canPlay() {
 		return p.isValid() && p.isOnline();
 	}
+
 	public void play() {
 		if (canceled)
 			return;
