@@ -64,7 +64,7 @@ public class NoteTrack implements ConfigurationSerializable {
 		else
 			return Messages.getString("MCMidi.track_note_count") + 0 + Messages.getString("MCMidi.track_length") + 0; //$NON-NLS-1$ //$NON-NLS-2$
 	}
-	public void placeBlock(Location start,final Vector direction,final int lineWidth) {
+	public void placeBlock(Location start,final Vector direction,final int lineWidth,Material base) {
 		if (notes.size() == 0) {
 			return;
 		}
@@ -92,7 +92,7 @@ public class NoteTrack implements ConfigurationSerializable {
 			long deltaTicks=Math.round(ni.ticks/2)-curticks;
 			while(deltaTicks>0) {
 				if(currentWidth<clw) {
-					world.getBlockAt(direct.getBlockX(),direct.getBlockY()-1,direct.getBlockZ()).setType(Material.STONE);
+					world.getBlockAt(direct.getBlockX(),direct.getBlockY()-1,direct.getBlockZ()).setType(base);
 					Block b=world.getBlockAt(direct);
 					b.setType(Material.DIODE_BLOCK_OFF);
 		
@@ -128,25 +128,25 @@ public class NoteTrack implements ConfigurationSerializable {
 						clw=lineWidth-4;
 					}else if(turned==4) {//create a ladder
 						if(direct.getBlockY()>=252)return;
-						world.getBlockAt(direct).setType(Material.STONE);
+						world.getBlockAt(direct).setType(base);
 						direct.add(0, 1, 0);
 						world.getBlockAt(direct).setType(Material.REDSTONE_WIRE);
 						direct.add(side);
-						world.getBlockAt(direct).setType(Material.STONE);
+						world.getBlockAt(direct).setType(base);
 						direct.add(0, 1, 0);
 						world.getBlockAt(direct).setType(Material.REDSTONE_WIRE);
 						direct.add(side);
-						world.getBlockAt(direct).setType(Material.STONE);
+						world.getBlockAt(direct).setType(base);
 						direct.add(0, 1, 0);
 						world.getBlockAt(direct).setType(Material.REDSTONE_WIRE);
 						direct.add(side);
-						world.getBlockAt(direct).setType(Material.STONE);
+						world.getBlockAt(direct).setType(base);
 						direct.add(0, 1, 0);
 						world.getBlockAt(direct).setType(Material.REDSTONE_WIRE);
 						turned=0;
 					}
 					if(deltaTicks!=0) {// compress (place redstone only when needed)
-					world.getBlockAt(direct.getBlockX(),direct.getBlockY()-1,direct.getBlockZ()).setType(Material.STONE);
+					world.getBlockAt(direct.getBlockX(),direct.getBlockY()-1,direct.getBlockZ()).setType(base);
 					world.getBlockAt(direct).setType(Material.REDSTONE_WIRE);
 					direct.add(forward);
 					}
@@ -157,19 +157,19 @@ public class NoteTrack implements ConfigurationSerializable {
 			Location current=direct.clone().add(forward).add(side).subtract(0, 1, 0);
 			Location redstoneline=direct.clone();
 			while (i<notes.size() && Math.round(notes.get(i).ticks/2) == curticks) {
-				notes.get(i).placeBlock(current);
+				notes.get(i).placeBlock(current,base);
 				redstoneline.add(side);
-				world.getBlockAt(redstoneline.getBlockX(),redstoneline.getBlockY()-1,redstoneline.getBlockZ()).setType(Material.STONE);
+				world.getBlockAt(redstoneline.getBlockX(),redstoneline.getBlockY()-1,redstoneline.getBlockZ()).setType(base);
 				world.getBlockAt(redstoneline).setType(Material.REDSTONE_WIRE);
 				current.add(side);
 				i++;
 			}
-			world.getBlockAt(direct.getBlockX(),direct.getBlockY()-1,direct.getBlockZ()).setType(Material.STONE);
+			world.getBlockAt(direct.getBlockX(),direct.getBlockY()-1,direct.getBlockZ()).setType(base);
 			world.getBlockAt(direct).setType(Material.REDSTONE_WIRE);
 			direct.add(forward);
 			currentWidth++;
 			if((currentWidth<clw-1)&&(notes.size()<=i||Math.round(notes.get(i).ticks/2)-curticks<=4)) {// compress (place redstone only when needed)
-				world.getBlockAt(direct.getBlockX(),direct.getBlockY()-1,direct.getBlockZ()).setType(Material.STONE);
+				world.getBlockAt(direct.getBlockX(),direct.getBlockY()-1,direct.getBlockZ()).setType(base);
 				world.getBlockAt(direct).setType(Material.REDSTONE_WIRE);
 				direct.add(forward);
 				currentWidth++;

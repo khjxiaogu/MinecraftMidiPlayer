@@ -18,6 +18,7 @@ import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.NoteBlock;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
@@ -29,11 +30,7 @@ import com.khjxiaogu.MCMidi.Midi.NoteTrack;
 
 public class MidiSheet implements ConfigurationSerializable {
 	public List<NoteTrack> tracks = new ArrayList<>();
-
-	public MidiSheet(Map<String, Object> map) {
-		tracks.addAll((Collection<NoteTrack>) map.get("tracks"));
-	}
-
+	private static int MsPerGameTick=50;
 	public MidiSheet(File f, int offset, float speed) throws InvalidMidiDataException, IOException {
 		Sequence sequence;
 		sequence = MidiSystem.getSequence(f);
@@ -46,35 +43,64 @@ public class MidiSheet implements ConfigurationSerializable {
 		int resolution = sequence.getResolution();
 		for (Track track : sequence.getTracks()) {
 			NoteTrack currentTrack = new NoteTrack();
-			float beatsPerMinute = 120;
+			double beatsPerMinute = 120;
+			double millisPerMidiTick;
+			if (framesPerSecond == 0F) {// PPQ mode
+				millisPerMidiTick = 60000 / beatsPerMinute / resolution / speed;
+			} else {
+				millisPerMidiTick = 1000 / resolution / framesPerSecond / speed;
+			}
+			//int b = 0;
 			if (track.size() > 0) {
 				for (int i = 0; i < track.size(); i++) {
-					float millisPerMidiTick;
-					if (framesPerSecond == 0F) {// PPQ mode
-						millisPerMidiTick = 60000 / beatsPerMinute / resolution / speed;
-					} else {
-						millisPerMidiTick = 1000 / resolution / framesPerSecond / speed;
-					}
+					
+
+					
 					MidiEvent event = track.get(i);
 					MidiMessage message = event.getMessage();
+					/*if (message instanceof MetaMessage) {
+						StringBuilder logsb=new StringBuilder(message.getClass().getSimpleName()).append(":");
+						byte[] msg=message.getMessage();
+						int status=message.getStatus();
+						
+						logsb.append(status).append(",");
+						logsb.append(((MetaMessage) message).getType()).append(",");
+						for(int ki=0;ki<msg.length;ki++) {
+							logsb.append(Integer.toHexString(Math.abs(msg[ki]))).append("-");
+						}
+						System.out.println(logsb.toString());
+					}*/
 					if (message instanceof ShortMessage) {
 						ShortMessage sm = (ShortMessage) message;
-						if (sm.getCommand() == 144) {// Detect KEY_ON message
+						if ((sm.getCommand()&0x90)>0) {// Detect KEY_ON message
 							currentTrack.add(sm.getData1() + offset * 12,
-									Math.round(event.getTick() * millisPerMidiTick / 50), sm.getData2());
+									Math.round(event.getTick() * millisPerMidiTick / MsPerGameTick), sm.getData2());
+							/*if(b==20) {
+								System.out.println(event.getTick());
+							}
+							b++;*/
 						}
 					} else if (message instanceof MetaMessage) {
 						MetaMessage metaMessage = (MetaMessage) message;
-						if (metaMessage.getStatus() == 0xff && metaMessage.getType() == 0x51) {// Detect Speed change
-																								// message
-							long microsPerBeat = 0;
-							byte[] byteData = metaMessage.getData();
-							for (int j = 0; j < byteData.length; j++) {
-								microsPerBeat *= 0x100;
-								microsPerBeat += byteData[j];
-							}
-							if (microsPerBeat != 0) {
-								beatsPerMinute = 60000000 / microsPerBeat;
+						if (metaMessage.getStatus() == 0xff ) {
+							if(metaMessage.getType() == 0x51) {// Detect tempo change
+								long microsPerBeat = 0;
+								
+								byte[] byteData = metaMessage.getData();
+								for (int j = 0; j < byteData.length; j++) {
+									microsPerBeat *= 0x100;
+									microsPerBeat += Byte.toUnsignedInt(byteData[j]);
+								}
+								//System.out.println(microsPerBeat);
+								if (microsPerBeat != 0) {
+									beatsPerMinute = 60000000 / microsPerBeat;
+								}
+								if (framesPerSecond == 0F) {// PPQ mode
+									millisPerMidiTick = 60000 / beatsPerMinute / resolution / speed;
+								} else {
+									millisPerMidiTick = 1000 / resolution / framesPerSecond / speed;
+								}
+								//b=0;
 							}
 						}
 					}
@@ -85,23 +111,27 @@ public class MidiSheet implements ConfigurationSerializable {
 			}
 		}
 	}
-	public void placeBlock(Location start,Vector direction) {
+	@SuppressWarnings("unchecked")
+	public MidiSheet(Map<String, Object> map) {
+		tracks.addAll((Collection<NoteTrack>) map.get("tracks"));
+	}
+	public void placeBlock(Location start,Vector direction,Material base) {
 		Location cur=start.clone();
 		NoteTrack Combined=new NoteTrack();
 		for(NoteTrack t:tracks) {
 			Combined.addAll(t);
 		}
 		Combined.sort();
-		Combined.placeBlock(cur, direction,24);
+		Combined.placeBlock(cur, direction,24,base);
 	}
-	public void placeBlock(Location start,Vector direction,final int width) {
+	public void placeBlock(Location start,Vector direction,final int width,Material base) {
 		Location cur=start.clone();
 		NoteTrack Combined=new NoteTrack();;
 		for(NoteTrack t:tracks) {
 			Combined.addAll(t);
 		}
 		Combined.sort();
-		Combined.placeBlock(cur, direction,width);
+		Combined.placeBlock(cur, direction,width,base);
 	}
 	public boolean Combine() {
 		if(tracks.size()==1)

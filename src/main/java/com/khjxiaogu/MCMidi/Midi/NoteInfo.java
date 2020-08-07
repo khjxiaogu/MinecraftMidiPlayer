@@ -25,13 +25,17 @@ public class NoteInfo implements ConfigurationSerializable {
 	Note n;
 	Instrument ins;
 	int volume = 64;
-	private final static Instrument[] inss = new Instrument[10];
+	private final static Instrument[] inss = new Instrument[25];
 	private final static Note[] notes = new Note[25];
 	private static Initializer init;
 	private final int key;
 
 	public static void initNotes() {
 		if (!MCMidi.plugin.getConfig().getBoolean("universal", false)) {
+			for(int i=24;i>=10;i--) {
+				NoteInfo.inss[i] = Instrument.BASS_DRUM;
+			}
+			
 			NoteInfo.inss[9] = Instrument.BASS_DRUM;
 			NoteInfo.inss[8] = Instrument.BASS_DRUM;
 			NoteInfo.inss[7] = Instrument.BASS_DRUM;
@@ -47,6 +51,9 @@ public class NoteInfo implements ConfigurationSerializable {
 				t.ins = NoteInfo.inss[k / 12];
 			};
 		} else {
+			for(int i=24;i>=10;i--) {
+				NoteInfo.inss[i] = Instrument.SNARE_DRUM;
+			}
 			NoteInfo.inss[9] = Instrument.SNARE_DRUM;
 			NoteInfo.inss[8] = Instrument.SNARE_DRUM;
 			Instrument Bell;
@@ -135,10 +142,10 @@ public class NoteInfo implements ConfigurationSerializable {
 		map.put("v", volume);
 		return map;
 	}
-	public void placeBlock(Location l) {
+	public void placeBlock(Location l,Material base) {
 		Block b=l.getWorld().getBlockAt(l);
 		Block under=l.getWorld().getBlockAt(l.getBlockX(),l.getBlockY()-1,l.getBlockZ());
-		l.getWorld().getBlockAt(l.getBlockX(),l.getBlockY()-2,l.getBlockZ()).setType(Material.STONE);
+		l.getWorld().getBlockAt(l.getBlockX(),l.getBlockY()-2,l.getBlockZ()).setType(base);
 		switch(ins) {
 		case BASS_DRUM:under.setType(Material.STONE);break;
 		case STICKS:under.setType(Material.GLASS);break;

@@ -6,6 +6,7 @@ import java.io.IOException;
 import javax.sound.midi.InvalidMidiDataException;
 
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -15,7 +16,7 @@ import com.khjxiaogu.MCMidi.MidiSheet;
 import com.khjxiaogu.MCMidi.Midi.NotePlayers;
 
 public class MidiAPI {
-	public static boolean generateStucture(String name,Location l,int width) {
+	public static boolean generateStucture(String name,Location l,int width,Material baseBlock) {
 		MidiSheet mp = MCMidi.plugin.loaded.get(name);
 		if(mp==null) {
 			return false;
@@ -27,7 +28,7 @@ public class MidiAPI {
 		if(v.getBlockX()==0&&v.getBlockZ()==0) {
 			v.setX(1);
 		}
-		mp.placeBlock(l,v,width);
+		mp.placeBlock(l,v,width,baseBlock);
 		return true;
 	}
 	public static boolean playFor(String name,Player p,boolean loop) {

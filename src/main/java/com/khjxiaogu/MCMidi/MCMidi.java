@@ -13,8 +13,10 @@ import javax.sound.midi.InvalidMidiDataException;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.NoteBlock;
+import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -125,14 +127,17 @@ public class MCMidi extends JavaPlugin {
 				p.sendMessage(Messages.getString("MCMidi.play_name_start") + args[1]); //$NON-NLS-1$
 				return true;
 			} else if (args[0].equals("loopblock")) { //$NON-NLS-1$
-				Player p;
+				World w;
 				if (sender instanceof Player) {
-					p = (Player) sender;
-				} else {
+					w= ((Player) sender).getWorld();
+				} else if(sender instanceof BlockCommandSender){
+					w=(( BlockCommandSender)sender).getBlock().getWorld();
+					
+				}else {
 					sender.sendMessage(Messages.getString("MCMidi.must_be_player"));//$NON-NLS-1$
 					return false;
 				}
-				Location l=new Location(p.getWorld(),Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]));
+				Location l=new Location(w,Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]));
 				NoteBlockPlayers np = nbs.get(l);
 				if (np != null) {
 					np.cancel();
@@ -146,6 +151,33 @@ public class MCMidi extends JavaPlugin {
 				if(ob==null||ob.getType()!=Material.NOTE_BLOCK)
 					return false;
 				nbs.put(l, mp.playBlock((NoteBlock)ob.getState(),true));
+				sender.sendMessage(Messages.getString("MCMidi.play_start")); //$NON-NLS-1$
+				return true;
+			} else if (args[0].equals("playblock")) { //$NON-NLS-1$
+				World w;
+				if (sender instanceof Player) {
+					w= ((Player) sender).getWorld();
+				} else if(sender instanceof BlockCommandSender){
+					w=(( BlockCommandSender)sender).getBlock().getWorld();
+					
+				}else {
+					sender.sendMessage(Messages.getString("MCMidi.must_be_player"));//$NON-NLS-1$
+					return false;
+				}
+				Location l=new Location(w,Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4]));
+				NoteBlockPlayers np = nbs.get(l);
+				if (np != null) {
+					np.cancel();
+				}
+				MidiSheet mp = loaded.get(args[1]);
+				if (mp == null) {
+					sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
+					return false;
+				}
+				Block ob=l.getBlock();
+				if(ob==null||ob.getType()!=Material.NOTE_BLOCK)
+					return false;
+				nbs.put(l, mp.playBlock((NoteBlock)ob.getState(),false));
 				sender.sendMessage(Messages.getString("MCMidi.play_start")); //$NON-NLS-1$
 				return true;
 			}else if (args[0].equals("loop")) { //$NON-NLS-1$
@@ -192,9 +224,12 @@ public class MCMidi extends JavaPlugin {
 				}
 				Player p=(Player) sender;
 				int width=24;
+				Material type=Material.STONE;
 				if(args.length>=3)
-					width=Integer.parseInt(args[2]);
-				if (!MidiAPI.generateStucture(args[1],p.getLocation(), width)) {
+					type=Material.getMaterial(Integer.valueOf(args[2]));
+				if(args.length>=4)
+					width=Integer.parseInt(args[3]);
+				if (!MidiAPI.generateStucture(args[1],p.getLocation(), width,type)) {
 					sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
 					return false;
 				}
@@ -258,7 +293,7 @@ public class MCMidi extends JavaPlugin {
 				list.addAll(Arrays.asList(getDataFolder().list((d, n) -> {
 					return !n.endsWith(".yml");//$NON-NLS-1$
 				})));
-			} else if (args[0].equals("play") || args[0].equals("loop") || args[0].equals("generate") || args[0].equals("loopblock")) {//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			} else if (args[0].equals("play") || args[0].equals("loop") || args[0].equals("generate") || args[0].equals("loopblock") || args[0].equals("playblock")) {//$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				list.addAll(loaded.keySet());
 			} else if (args[0].equals("stop"))//$NON-NLS-1$
 				return null;
@@ -290,6 +325,7 @@ public class MCMidi extends JavaPlugin {
 		ConfigurationSerialization.registerClass(NoteInfo.class);
 		ConfigurationSerialization.registerClass(NoteTrack.class);
 		ConfigurationSerialization.registerClass(MidiSheet.class);
+		
 	}
 
 	@Override
@@ -305,9 +341,11 @@ public class MCMidi extends JavaPlugin {
 					for (String s : cs.getKeys(false)) {
 						try {
 							ConfigurationSection cur = cs.getConfigurationSection(s);
-							loaded.put((String) cur.get("name"), (MidiSheet) cur.get("midi"));//$NON-NLS-1$ //$NON-NLS-2$
+							getLogger().info("loading"+cur.getString("name"));
+							loaded.put(cur.getString("name"), (MidiSheet) cur.get("midi"));//$NON-NLS-1$ //$NON-NLS-2$
 						} catch (Throwable t) {
 							getLogger().info("midi " + s + " load failure");//$NON-NLS-1$ //$NON-NLS-2$
+							t.printStackTrace();
 						}
 					}
 				}
