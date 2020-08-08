@@ -1,4 +1,4 @@
-package com.khjxiaogu.MCMidi.Midi;
+package com.khjxiaogu.MCMidi.Midi.Players;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,8 @@ import org.bukkit.block.NoteBlock;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.khjxiaogu.MCMidi.MCMidi;
-import com.khjxiaogu.MCMidi.MidiSheet;
+import com.khjxiaogu.MCMidi.Midi.MidiSheet;
+import com.khjxiaogu.MCMidi.Midi.NoteTrack;
 
 public class NoteBlockPlayers {
 	List<TrackPlayer> players = new ArrayList<>();

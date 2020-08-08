@@ -21,10 +21,10 @@ public class NoteInfo implements ConfigurationSerializable {
 		public void init(NoteInfo n, int key);
 	}
 
-	long ticks;
-	Note n;
-	Instrument ins;
-	int volume = 64;
+	public long ticks;
+	public Note n;
+	public Instrument ins;
+	public int volume = 64;
 	private final static Instrument[] inss = new Instrument[25];
 	private final static Note[] notes = new Note[25];
 	private static Initializer init;
@@ -32,11 +32,9 @@ public class NoteInfo implements ConfigurationSerializable {
 
 	public static void initNotes() {
 		if (MCMidi.plugin.getConfig().getBoolean("universal", false)) {
-			for (int i = 24; i >= 10; i--) {
+			for (int i = 24; i >= 8; i--) {
 				NoteInfo.inss[i] = Instrument.SNARE_DRUM;
 			}
-			NoteInfo.inss[9] = Instrument.SNARE_DRUM;
-			NoteInfo.inss[8] = Instrument.SNARE_DRUM;
 			Instrument Bell;
 			try {
 				Bell = Instrument.valueOf("BELL");// attempt to use 1.12 bell to provide better performation

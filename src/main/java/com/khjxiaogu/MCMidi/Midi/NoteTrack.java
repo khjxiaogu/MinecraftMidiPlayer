@@ -17,9 +17,15 @@ import org.bukkit.material.Diode;
 import org.bukkit.util.Vector;
 
 import com.khjxiaogu.MCMidi.Messages;
+import com.khjxiaogu.MCMidi.Midi.Players.NoteBlockPlayer;
+import com.khjxiaogu.MCMidi.Midi.Players.TrackPlayer;
 
 public class NoteTrack implements ConfigurationSerializable {
 	List<NoteInfo> notes = new ArrayList<>();
+
+	public List<NoteInfo> getNotes() {
+		return notes;
+	}
 
 	public NoteTrack() {
 	}

@@ -1,6 +1,9 @@
-package com.khjxiaogu.MCMidi.Midi;
+package com.khjxiaogu.MCMidi.Midi.Players;
 
 import org.bukkit.block.NoteBlock;
+
+import com.khjxiaogu.MCMidi.Midi.NoteInfo;
+import com.khjxiaogu.MCMidi.Midi.NoteTrack;
 
 public class NoteBlockPlayer extends TrackPlayer {
 	NoteBlock nb;

@@ -26,10 +26,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import com.khjxiaogu.MCMidi.Midi.NoteBlockPlayers;
+
+import com.khjxiaogu.MCMidi.Midi.MidiSheet;
 import com.khjxiaogu.MCMidi.Midi.NoteInfo;
-import com.khjxiaogu.MCMidi.Midi.NotePlayers;
 import com.khjxiaogu.MCMidi.Midi.NoteTrack;
+import com.khjxiaogu.MCMidi.Midi.Players.NoteBlockPlayers;
+import com.khjxiaogu.MCMidi.Midi.Players.NotePlayers;
 import com.khjxiaogu.MCMidi.api.MidiAPI;
 
 public class MCMidi extends JavaPlugin {
@@ -55,6 +57,9 @@ public class MCMidi extends JavaPlugin {
 			sender.sendMessage(Messages.getString("MCMidi.help5")); //$NON-NLS-1$
 			sender.sendMessage(Messages.getString("MCMidi.help6")); //$NON-NLS-1$
 			sender.sendMessage(Messages.getString("MCMidi.help7")); //$NON-NLS-1$
+			sender.sendMessage(Messages.getString("MCMidi.help7_1"));
+			sender.sendMessage(Messages.getString("MCMidi.help7_2"));
+			sender.sendMessage(Messages.getString("MCMidi.help8"));
 			return true;
 		}
 		if (args.length >= 2) {

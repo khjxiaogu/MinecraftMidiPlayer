@@ -1,9 +1,13 @@
-package com.khjxiaogu.MCMidi.Midi;
+package com.khjxiaogu.MCMidi.Midi.Players;
+
+import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import com.khjxiaogu.MCMidi.MCMidi;
+import com.khjxiaogu.MCMidi.Midi.NoteInfo;
+import com.khjxiaogu.MCMidi.Midi.NoteTrack;
 
 public class TrackPlayer {
 	private Player p;
@@ -47,37 +51,38 @@ public class TrackPlayer {
 	}
 
 	public void play() {
+		List<NoteInfo> notes=nc.getNotes();
 		if (canceled)
 			return;
-		if (nc.notes.size() == 0) {
+		if (notes.size() == 0) {
 			synchronized (finished) {
 				finished = true;
 			}
 			return;
 		}
-		if (index >= nc.notes.size()) {
+		if (index >= notes.size()) {
 			synchronized (finished) {
 				finished = true;
 			}
 			return;
 		}
 		if (index > 0) {
-			play(nc.notes.get(index));
+			play(nc.getNotes().get(index));
 		}
 		index++;
-		while (index < nc.notes.size() && nc.notes.get(index).ticks == curticks) {
-			play(nc.notes.get(index));
+		while (index < notes.size() && notes.get(index).ticks == curticks) {
+			play(notes.get(index));
 			index++;
 		}
-		if (index >= nc.notes.size()) {
+		if (index >= notes.size()) {
 			synchronized (finished) {
 				finished = true;
 			}
 			return;
 		}
 
-		long wait = nc.notes.get(index).ticks - curticks;
-		curticks = nc.notes.get(index).ticks;
+		long wait = notes.get(index).ticks - curticks;
+		curticks = notes.get(index).ticks;
 		new BukkitRunnable() {
 			@Override
 			public void run() {

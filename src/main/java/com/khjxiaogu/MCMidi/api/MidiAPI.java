@@ -11,8 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import com.khjxiaogu.MCMidi.MCMidi;
-import com.khjxiaogu.MCMidi.MidiSheet;
-import com.khjxiaogu.MCMidi.Midi.NotePlayers;
+import com.khjxiaogu.MCMidi.Midi.MidiSheet;
+import com.khjxiaogu.MCMidi.Midi.Players.NotePlayers;
 
 public class MidiAPI {
 	public static boolean generateStucture(String name, Location l, int width, Material baseBlock) {

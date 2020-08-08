@@ -1,4 +1,4 @@
-package com.khjxiaogu.MCMidi;
+package com.khjxiaogu.MCMidi.Midi;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,9 +24,8 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import com.khjxiaogu.MCMidi.Midi.NoteBlockPlayers;
-import com.khjxiaogu.MCMidi.Midi.NotePlayers;
-import com.khjxiaogu.MCMidi.Midi.NoteTrack;
+import com.khjxiaogu.MCMidi.Midi.Players.NoteBlockPlayers;
+import com.khjxiaogu.MCMidi.Midi.Players.NotePlayers;
 
 public class MidiSheet implements ConfigurationSerializable {
 	public List<NoteTrack> tracks = new ArrayList<>();
