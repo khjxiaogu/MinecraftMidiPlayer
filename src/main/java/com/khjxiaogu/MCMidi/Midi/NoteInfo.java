@@ -28,7 +28,7 @@ public class NoteInfo implements ConfigurationSerializable {
 	private final static Instrument[] inss = new Instrument[25];
 	private final static Note[] notes = new Note[25];
 	private static Initializer init;
-	private final int key;
+	private int key;
 
 	public static void initNotes() {
 		if (MCMidi.plugin.getConfig().getBoolean("universal", false)) {
@@ -114,8 +114,16 @@ public class NoteInfo implements ConfigurationSerializable {
 		this.key = key;
 	}
 
-	public NoteInfo(Map<?, ?> map) {
-		this((int) map.get("k"), (int) map.get("t"), (int) map.get("v"));
+	public static NoteInfo valueOf(Map<String,Object> map) {
+		if(map.containsKey("x")) {
+			String ns=(String) map.get("x");
+			String[] cs=ns.split(":");
+			int k=Integer.parseInt(cs[0]);
+			int t=Integer.parseInt(cs[1]);
+			int v=Integer.parseInt(cs[2]);
+			return getNote(k,t,v);
+		}
+		return getNote((int) map.get("k"), (int) map.get("t"), (int) map.get("v"));
 	}
 
 	public static NoteInfo getNote(int key, long tick, int vol) {
@@ -137,12 +145,9 @@ public class NoteInfo implements ConfigurationSerializable {
 	@Override
 	public Map<String, Object> serialize() {
 		Map<String, Object> map = new HashMap<>();
-		map.put("k", key);
-		map.put("t", ticks);
-		map.put("v", volume);
+		map.put("x",key+":"+ticks+":"+volume);
 		return map;
 	}
-
 	public void placeBlock(Location l, Material base) {
 		Block b = l.getWorld().getBlockAt(l);
 		Block under = l.getWorld().getBlockAt(l.getBlockX(), l.getBlockY() - 1, l.getBlockZ());

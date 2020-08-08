@@ -32,8 +32,8 @@ public class NoteTrack implements ConfigurationSerializable {
 
 	@SuppressWarnings("unchecked")
 	public NoteTrack(Map<String, Object> map) {
-		for (Map<?, ?> ms : (List<Map<String, Object>>) map.get("notes")) {
-			notes.add(new NoteInfo(ms));
+		for (Map<String, Object> ms : (List<Map<String, Object>>) map.get("notes")) {
+			notes.add(NoteInfo.valueOf(ms));
 		}
 	}
 
