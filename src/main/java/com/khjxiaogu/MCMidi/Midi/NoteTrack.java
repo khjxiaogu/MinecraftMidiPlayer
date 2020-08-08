@@ -21,7 +21,7 @@ import com.khjxiaogu.MCMidi.Midi.Players.NoteBlockPlayer;
 import com.khjxiaogu.MCMidi.Midi.Players.TrackPlayer;
 
 public class NoteTrack implements ConfigurationSerializable {
-	List<NoteInfo> notes = new ArrayList<>();
+	public final List<NoteInfo> notes = new ArrayList<>();
 
 	public List<NoteInfo> getNotes() {
 		return notes;

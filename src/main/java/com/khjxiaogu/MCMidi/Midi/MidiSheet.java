@@ -29,7 +29,7 @@ import com.khjxiaogu.MCMidi.Midi.Players.NotePlayers;
 
 public class MidiSheet implements ConfigurationSerializable {
 	public List<NoteTrack> tracks = new ArrayList<>();
-	private static int MsPerGameTick = 50;
+	private final static int MsPerGameTick = 50;
 
 	public MidiSheet(File f, int offset, float speed) throws InvalidMidiDataException, IOException {
 		Sequence sequence;
