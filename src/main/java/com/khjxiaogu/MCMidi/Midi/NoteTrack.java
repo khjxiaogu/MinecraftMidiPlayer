@@ -20,16 +20,42 @@ import com.khjxiaogu.MCMidi.Messages;
 import com.khjxiaogu.MCMidi.Midi.Players.NoteBlockPlayer;
 import com.khjxiaogu.MCMidi.Midi.Players.TrackPlayer;
 
+// TODO: Auto-generated Javadoc
+/**
+ * Class NoteTrack.
+ *
+ * @author khjxiaogu
+ * file: NoteTrack.java
+ * time: 2020年8月9日
+ */
 public class NoteTrack implements ConfigurationSerializable {
+	
+	/** The notes.<br> 成员 notes. */
 	public final List<NoteInfo> notes = new ArrayList<>();
 
+	/**
+	 * Gets the notes.<br>
+	 * 获取 notes.
+	 *
+	 * @return notes<br>
+	 */
 	public List<NoteInfo> getNotes() {
 		return notes;
 	}
 
+	/**
+	 * Instantiates a new NoteTrack.<br>
+	 * 新建一个NoteTrack类<br>
+	 */
 	public NoteTrack() {
 	}
 
+	/**
+	 * Instantiates a new NoteTrack with a Map object.<br>
+	 * 使用一个Map新建一个NoteTrack类<br>
+	 *
+	 * @param map the map<br>
+	 */
 	@SuppressWarnings("unchecked")
 	public NoteTrack(Map<String, Object> map) {
 		for (Map<String, Object> ms : (List<Map<String, Object>>) map.get("notes")) {
@@ -37,6 +63,13 @@ public class NoteTrack implements ConfigurationSerializable {
 		}
 	}
 
+	/**
+	 * Adds the.<br>
+	 *
+	 * @param key the key<br>
+	 * @param tick the tick<br>
+	 * @param vol the vol<br>
+	 */
 	public void add(int key, long tick, int vol) {
 		NoteInfo ni = NoteInfo.getNote(key, tick, vol);
 		if (ni != null) {
@@ -44,26 +77,52 @@ public class NoteTrack implements ConfigurationSerializable {
 		}
 	}
 
+	/**
+	 * Adds the all.<br>
+	 *
+	 * @param ref the ref<br>
+	 */
 	public void addAll(NoteTrack ref) {
 		notes.addAll(ref.notes);
 	}
 
+	/**
+	 * Play all.<br>
+	 *
+	 * @param p the p<br>
+	 * @return return play all <br>返回 track player
+	 */
 	public TrackPlayer playAll(Player p) {
 		TrackPlayer ret = new TrackPlayer(p, this);
 		ret.play();
 		return ret;
 	}
 
+	/**
+	 * Play all.<br>
+	 *
+	 * @param nb the nb<br>
+	 * @return return play all <br>返回 note block player
+	 */
 	public NoteBlockPlayer playAll(NoteBlock nb) {
 		NoteBlockPlayer ret = new NoteBlockPlayer(nb, this);
 		ret.play();
 		return ret;
 	}
 
+	/**
+	 * Gets the size.<br>
+	 * 获取 size.
+	 *
+	 * @return size<br>
+	 */
 	public int getSize() {
 		return notes.size();
 	}
 
+	/**
+	 * Sort.<br>
+	 */
 	public void sort() {
 		notes.sort((c1, c2) -> {
 			return (int) (c1.ticks - c2.ticks);
@@ -71,6 +130,12 @@ public class NoteTrack implements ConfigurationSerializable {
 
 	}
 
+	/**
+	 * Gets the info.<br>
+	 * 获取 info.
+	 *
+	 * @return info<br>
+	 */
 	public String getInfo() {
 		if (notes.size() > 0)
 			return Messages.getString("MCMidi.track_note_count") + notes.size() //$NON-NLS-1$
@@ -79,6 +144,14 @@ public class NoteTrack implements ConfigurationSerializable {
 			return Messages.getString("MCMidi.track_note_count") + 0 + Messages.getString("MCMidi.track_length") + 0; //$NON-NLS-1$ //$NON-NLS-2$
 	}
 
+	/**
+	 * Place block.<br>
+	 *
+	 * @param start the start<br>
+	 * @param direction the direction<br>
+	 * @param lineWidth the line width<br>
+	 * @param base the base<br>
+	 */
 	public void placeBlock(Location start, final Vector direction, final int lineWidth, Material base) {
 		if (notes.size() == 0) {
 			return;
@@ -203,6 +276,11 @@ public class NoteTrack implements ConfigurationSerializable {
 		}
 	}
 
+	/**
+	 * Serialize.<br>
+	 *
+	 * @return return serialize <br>返回 map
+	 */
 	@Override
 	public Map<String, Object> serialize() {
 		Map<String, Object> map = new HashMap<>();

@@ -27,10 +27,30 @@ import org.bukkit.util.Vector;
 import com.khjxiaogu.MCMidi.Midi.Players.NoteBlockPlayers;
 import com.khjxiaogu.MCMidi.Midi.Players.NotePlayers;
 
+// TODO: Auto-generated Javadoc
+/**
+ * Class MidiSheet.
+ *
+ * @author khjxiaogu
+ * file: MidiSheet.java
+ * time: 2020年8月9日
+ */
 public class MidiSheet implements ConfigurationSerializable {
+	
+	/** The tracks.<br> 成员 tracks. */
 	public List<NoteTrack> tracks = new ArrayList<>();
 	private final static int MsPerGameTick = 50;
 
+	/**
+	 * Instantiates a new MidiSheet.<br>
+	 * 新建一个MidiSheet类<br>
+	 *
+	 * @param f the f<br>
+	 * @param offset the offset<br>
+	 * @param speed the speed<br>
+	 * @throws InvalidMidiDataException if an invalid midi data exception occurred.<br>如果invalid midi data exception发生了
+	 * @throws IOException Signals that an I/O exception has occurred.<br>发生IO错误
+	 */
 	public MidiSheet(File f, int offset, float speed) throws InvalidMidiDataException, IOException {
 		Sequence sequence;
 		sequence = MidiSystem.getSequence(f);
@@ -56,32 +76,11 @@ public class MidiSheet implements ConfigurationSerializable {
 
 					MidiEvent event = track.get(i);
 					MidiMessage message = event.getMessage();
-					/*
-					 * if (message instanceof MetaMessage) {
-					 * StringBuilder logsb=new
-					 * StringBuilder(message.getClass().getSimpleName()).append(":");
-					 * byte[] msg=message.getMessage();
-					 * int status=message.getStatus();
-					 * 
-					 * logsb.append(status).append(",");
-					 * logsb.append(((MetaMessage) message).getType()).append(",");
-					 * for(int ki=0;ki<msg.length;ki++) {
-					 * logsb.append(Integer.toHexString(Math.abs(msg[ki]))).append("-");
-					 * }
-					 * System.out.println(logsb.toString());
-					 * }
-					 */
 					if (message instanceof ShortMessage) {
 						ShortMessage sm = (ShortMessage) message;
 						if ((sm.getCommand() & 0x90) > 0) {// Detect KEY_ON message
 							currentTrack.add(sm.getData1() + offset * 12,
 									Math.round(event.getTick() * millisPerMidiTick / MsPerGameTick), sm.getData2());
-							/*
-							 * if(b==20) {
-							 * System.out.println(event.getTick());
-							 * }
-							 * b++;
-							 */
 						}
 					} else if (message instanceof MetaMessage) {
 						MetaMessage metaMessage = (MetaMessage) message;
@@ -94,7 +93,6 @@ public class MidiSheet implements ConfigurationSerializable {
 									microsPerBeat *= 0x100;
 									microsPerBeat += Byte.toUnsignedInt(byteData[j]);
 								}
-								// System.out.println(microsPerBeat);
 								if (microsPerBeat != 0) {
 									beatsPerMinute = 60000000 / microsPerBeat;
 								}
@@ -103,7 +101,6 @@ public class MidiSheet implements ConfigurationSerializable {
 								} else {
 									millisPerMidiTick = 1000 / resolution / framesPerSecond / speed;
 								}
-								// b=0;
 							}
 						}
 					}
@@ -115,11 +112,24 @@ public class MidiSheet implements ConfigurationSerializable {
 		}
 	}
 
+	/**
+	 * Instantiates a new MidiSheet with a Map object.<br>
+	 * 使用一个Map新建一个MidiSheet类<br>
+	 *
+	 * @param map the map<br>
+	 */
 	@SuppressWarnings("unchecked")
 	public MidiSheet(Map<String, Object> map) {
 		tracks.addAll((Collection<NoteTrack>) map.get("tracks"));
 	}
 
+	/**
+	 * Place block.<br>
+	 *
+	 * @param start the start<br>
+	 * @param direction the direction<br>
+	 * @param base the base<br>
+	 */
 	public void placeBlock(Location start, Vector direction, Material base) {
 		Location cur = start.clone();
 		NoteTrack Combined = new NoteTrack();
@@ -130,6 +140,14 @@ public class MidiSheet implements ConfigurationSerializable {
 		Combined.placeBlock(cur, direction, 24, base);
 	}
 
+	/**
+	 * Place block.<br>
+	 *
+	 * @param start the start<br>
+	 * @param direction the direction<br>
+	 * @param width the width<br>
+	 * @param base the base<br>
+	 */
 	public void placeBlock(Location start, Vector direction, final int width, Material base) {
 		Location cur = start.clone();
 		NoteTrack Combined = new NoteTrack();
@@ -141,6 +159,11 @@ public class MidiSheet implements ConfigurationSerializable {
 		Combined.placeBlock(cur, direction, width, base);
 	}
 
+	/**
+	 * Combine.<br>
+	 *
+	 * @return true, if <br>如果，返回true。
+	 */
 	public boolean Combine() {
 		if (tracks.size() == 1)
 			return false;
@@ -155,18 +178,44 @@ public class MidiSheet implements ConfigurationSerializable {
 		return true;
 	}
 
+	/**
+	 * Play for.<br>
+	 *
+	 * @param p the p<br>
+	 * @return return play for <br>返回 note players
+	 */
 	public NotePlayers playFor(Player p) {
 		return new NotePlayers(p, this);
 	}
 
+	/**
+	 * Play for.<br>
+	 *
+	 * @param p the p<br>
+	 * @param loop the loop<br>
+	 * @return return play for <br>返回 note players
+	 */
 	public NotePlayers playFor(Player p, boolean loop) {
 		return new NotePlayers(p, this, loop);
 	}
 
+	/**
+	 * Play block.<br>
+	 *
+	 * @param nb the nb<br>
+	 * @param loop the loop<br>
+	 * @return return play block <br>返回 note block players
+	 */
 	public NoteBlockPlayers playBlock(NoteBlock nb, boolean loop) {
 		return new NoteBlockPlayers(nb, this, loop);
 	}
 
+	/**
+	 * Gets the info.<br>
+	 * 获取 info.
+	 *
+	 * @return info<br>
+	 */
 	public String getInfo() {
 		StringBuilder sb = new StringBuilder("Tracks Info:\n");
 		for (int i = 0; i < tracks.size(); i++) {
@@ -179,6 +228,11 @@ public class MidiSheet implements ConfigurationSerializable {
 		return sb.toString();
 	}
 
+	/**
+	 * Serialize.<br>
+	 *
+	 * @return return serialize <br>返回 map
+	 */
 	@Override
 	public Map<String, Object> serialize() {
 		Map<String, Object> map = new HashMap<>();

@@ -15,21 +15,54 @@ import org.bukkit.entity.Player;
 
 import com.khjxiaogu.MCMidi.MCMidi;
 
+// TODO: Auto-generated Javadoc
+/**
+ * Class NoteInfo.
+ *
+ * @author khjxiaogu
+ * file: NoteInfo.java
+ * time: 2020年8月9日
+ */
 public class NoteInfo implements ConfigurationSerializable {
+	
+	/**
+	 * Interface Initializer.
+	 *
+	 * @author khjxiaogu
+	 * file: NoteInfo.java
+	 * time: 2020年8月9日
+	 */
 	@FunctionalInterface
 	interface Initializer {
+		
+		/**
+		 * Inits the.<br>
+		 *
+		 * @param n the n<br>
+		 * @param key the key<br>
+		 */
 		public void init(NoteInfo n, int key);
 	}
 
+	/** The ticks.<br> 成员 ticks. */
 	public long ticks;
+	
+	/** The n.<br> 成员 n. */
 	public Note n;
+	
+	/** The ins.<br> 成员 ins. */
 	public Instrument ins;
+	
+	/** The volume.<br> 成员 volume. */
 	public int volume = 64;
 	private final static Instrument[] inss = new Instrument[25];
 	private final static Note[] notes = new Note[25];
 	private static Initializer init;
 	private int key;
 
+	/**
+	 * Inits the notes.<br>
+	 */
 	public static void initNotes() {
 		if (MCMidi.plugin.getConfig().getBoolean("universal", false)) {
 			for (int i = 24; i >= 8; i--) {
@@ -101,12 +134,26 @@ public class NoteInfo implements ConfigurationSerializable {
 		NoteInfo.notes[24] = Note.sharp(2, Tone.F);
 	}
 
+	/**
+	 * Instantiates a new NoteInfo with a long object.<br>
+	 * 使用一个long新建一个NoteInfo类<br>
+	 *
+	 * @param ticks the ticks<br>
+	 */
 	public NoteInfo(long ticks) {
 		this.ticks = ticks;
 		n = null;
 		key = 0;
 	}
 
+	/**
+	 * Instantiates a new NoteInfo.<br>
+	 * 新建一个NoteInfo类<br>
+	 *
+	 * @param key the key<br>
+	 * @param tick the tick<br>
+	 * @param vol the vol<br>
+	 */
 	public NoteInfo(int key, long tick, int vol) {
 		volume = vol;
 		ticks = tick;
@@ -114,6 +161,12 @@ public class NoteInfo implements ConfigurationSerializable {
 		this.key = key;
 	}
 
+	/**
+	 * Value of.<br>
+	 *
+	 * @param map the map<br>
+	 * @return return value of <br>返回 note info
+	 */
 	public static NoteInfo valueOf(Map<String,Object> map) {
 		if(map.containsKey("x")) {
 			String ns=(String) map.get("x");
@@ -126,28 +179,59 @@ public class NoteInfo implements ConfigurationSerializable {
 		return getNote((int) map.get("k"), (int) map.get("t"), (int) map.get("v"));
 	}
 
+	/**
+	 * Gets the note.<br>
+	 * 获取 note.
+	 *
+	 * @param key the key<br>
+	 * @param tick the tick<br>
+	 * @param vol the vol<br>
+	 * @return note<br>
+	 */
 	public static NoteInfo getNote(int key, long tick, int vol) {
 		return new NoteInfo(key, tick, vol);
 	}
 
+	/**
+	 * Play.<br>
+	 *
+	 * @param p the p<br>
+	 */
 	public void play(Player p) {
 		if (n != null) {
 			p.playNote(p.getLocation(), ins, n);
 		}
 	}
 
+	/**
+	 * Play.<br>
+	 *
+	 * @param b the b<br>
+	 */
 	public void play(NoteBlock b) {
 		if (n != null) {
 			b.play(ins, n);
 		}
 	}
 
+	/**
+	 * Serialize.<br>
+	 *
+	 * @return return serialize <br>返回 map
+	 */
 	@Override
 	public Map<String, Object> serialize() {
 		Map<String, Object> map = new HashMap<>();
 		map.put("x",key+":"+ticks+":"+volume);
 		return map;
 	}
+	
+	/**
+	 * Place block.<br>
+	 *
+	 * @param l the l<br>
+	 * @param base the base<br>
+	 */
 	public void placeBlock(Location l, Material base) {
 		Block b = l.getWorld().getBlockAt(l);
 		Block under = l.getWorld().getBlockAt(l.getBlockX(), l.getBlockY() - 1, l.getBlockZ());
