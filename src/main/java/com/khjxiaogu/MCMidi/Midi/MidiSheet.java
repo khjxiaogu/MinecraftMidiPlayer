@@ -70,24 +70,25 @@ public class MidiSheet implements ConfigurationSerializable {
 			} else {
 				millisPerMidiTick = 1000 / resolution / framesPerSecond / speed;
 			}
-			// int b = 0;
+			long lastOffset=0;
+			long lastTick=0;
 			if (track.size() > 0) {
 				for (int i = 0; i < track.size(); i++) {
-
 					MidiEvent event = track.get(i);
 					MidiMessage message = event.getMessage();
 					if (message instanceof ShortMessage) {
 						ShortMessage sm = (ShortMessage) message;
-						if ((sm.getCommand() & 0x90) > 0) {// Detect KEY_ON message
-							currentTrack.add(sm.getData1() + offset * 12,
-									Math.round(event.getTick() * millisPerMidiTick / MsPerGameTick), sm.getData2());
+						if ((sm.getCommand() & ShortMessage.NOTE_ON) > 0) {// Detect KEY_ON message
+							long delta=event.getTick()-lastTick;
+							lastTick=event.getTick();
+							lastOffset+=Math.round(delta * millisPerMidiTick / MsPerGameTick);
+							currentTrack.add(sm.getData1() + offset * 12,lastOffset, sm.getData2());
 						}
 					} else if (message instanceof MetaMessage) {
 						MetaMessage metaMessage = (MetaMessage) message;
 						if (metaMessage.getStatus() == 0xff) {
 							if (metaMessage.getType() == 0x51) {// Detect tempo change
 								long microsPerBeat = 0;
-
 								byte[] byteData = metaMessage.getData();
 								for (int j = 0; j < byteData.length; j++) {
 									microsPerBeat *= 0x100;
