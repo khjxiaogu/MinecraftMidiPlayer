@@ -2,7 +2,7 @@
 [简体中文](#minecraft-midi%E6%92%AD%E6%94%BE%E5%99%A8)  
 a simple bukkit plugin to play midi in your minecraft server!   
 Minecraft version: 1.8.1+   
-Can map notes to several instruments, creating a note range from A0 to C7(1.8+)or even A0 to C9(1.12+), nearly all midi notes are supported in 1.12+(midi supports from A0 to G#9).  
+Can map notes to several instruments, creating a note range from C0 to C7(1.8+)or even C0 to C9(1.12+), nearly all midi notes are supported in 1.12+(midi supports from C0 to G#9).  
 Also compatible with Piano+ resource pack, creating a note range from C1 to C7, only thing to do is to set config item "universal" in "plugin.yml" to false.  
 [Piano+ 1.6+](https://drive.google.com/file/d/0B6nFdqZCyZZ2dTdTa2lQZnZQdWM/edit?usp=sharing)   
 [Piano+ 1.9-1.12](https://www.mediafire.com/file/zbawlf4ae3ukrbf/Piano++(1.12).7z)   
