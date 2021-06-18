@@ -20,7 +20,13 @@ public class NoteBlockPlayer extends TrackPlayer {
 
 	@Override
 	public boolean canPlay() {
-		return nb.isPlaced();
+		try {
+			nb.getBlock();
+			return true;
+		}catch(Exception ex){
+			return false;
+		}
+		
 	}
 
 }
