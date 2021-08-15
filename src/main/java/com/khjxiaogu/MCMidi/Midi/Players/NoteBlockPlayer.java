@@ -1,14 +1,14 @@
 package com.khjxiaogu.MCMidi.Midi.Players;
 
-import org.bukkit.block.NoteBlock;
+import org.bukkit.block.Block;
 
 import com.khjxiaogu.MCMidi.Midi.NoteInfo;
 import com.khjxiaogu.MCMidi.Midi.NoteTrack;
 
 public class NoteBlockPlayer extends TrackPlayer {
-	NoteBlock nb;
+	Block nb;
 
-	public NoteBlockPlayer(NoteBlock b, NoteTrack nc) {
+	public NoteBlockPlayer(Block b, NoteTrack nc) {
 		super(null, nc);
 		nb = b;
 	}
@@ -21,7 +21,7 @@ public class NoteBlockPlayer extends TrackPlayer {
 	@Override
 	public boolean canPlay() {
 		try {
-			nb.getBlock();
+			//nb.getBlock();
 			return true;
 		}catch(Exception ex){
 			return false;

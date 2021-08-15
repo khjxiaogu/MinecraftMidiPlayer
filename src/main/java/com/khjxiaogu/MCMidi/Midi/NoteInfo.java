@@ -1,16 +1,19 @@
 package com.khjxiaogu.MCMidi.Midi;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Instrument;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Note;
 import org.bukkit.Note.Tone;
 import org.bukkit.block.Block;
-import org.bukkit.block.NoteBlock;
+import org.bukkit.block.data.type.NoteBlock;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import com.khjxiaogu.MCMidi.MCMidi;
@@ -208,9 +211,13 @@ public class NoteInfo implements ConfigurationSerializable {
 	 *
 	 * @param b the b<br>
 	 */
-	public void play(NoteBlock b) {
+	public void play(Block b) {
 		if (n != null) {
-			b.play(ins, n);
+			for(Player p:Bukkit.getOnlinePlayers()) {
+				p.playNote(b.getLocation(), ins, n);
+			}
+			
+			//b.play(ins, n);
 		}
 	}
 
@@ -250,16 +257,18 @@ public class NoteInfo implements ConfigurationSerializable {
 			under.setType(Material.SAND);
 			break;
 		case BASS_GUITAR:
-			under.setType(Material.WOOD);
+			under.setType(Material.BIRCH_WOOD);
 			break;
 		default:
 			under.setType(Material.GOLD_BLOCK);
 			break;
 		}
 		b.setType(Material.NOTE_BLOCK);
-		NoteBlock nb = (NoteBlock) b.getState();
+		NoteBlock nb = (NoteBlock) b.getBlockData();
 		nb.setNote(n);
-		nb.update();
+		nb.setInstrument(ins);
+		b.setBlockData(nb);
+		//nb.update();
 		// b.setData(n.getId());
 	}
 }

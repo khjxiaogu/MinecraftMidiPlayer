@@ -19,7 +19,7 @@ import javax.sound.midi.Track;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.NoteBlock;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -39,6 +39,7 @@ public class MidiSheet implements ConfigurationSerializable {
 	
 	/** The tracks.<br> 成员 tracks. */
 	public List<NoteTrack> tracks = new ArrayList<>();
+	public String filename;
 	private final static int MsPerGameTick = 50;
 
 	/**
@@ -52,6 +53,7 @@ public class MidiSheet implements ConfigurationSerializable {
 	 * @throws IOException Signals that an I/O exception has occurred.<br>发生IO错误
 	 */
 	public MidiSheet(File f, int offset, float speed) throws InvalidMidiDataException, IOException {
+		filename=f.getName();
 		Sequence sequence;
 		sequence = MidiSystem.getSequence(f);
 		float framesPerSecond;
@@ -122,6 +124,7 @@ public class MidiSheet implements ConfigurationSerializable {
 	@SuppressWarnings("unchecked")
 	public MidiSheet(Map<String, Object> map) {
 		tracks.addAll((Collection<NoteTrack>) map.get("tracks"));
+		filename=String.valueOf(map.get("name"));
 	}
 
 	/**
@@ -207,7 +210,7 @@ public class MidiSheet implements ConfigurationSerializable {
 	 * @param loop the loop<br>
 	 * @return return play block <br>返回 note block players
 	 */
-	public NoteBlockPlayers playBlock(NoteBlock nb, boolean loop) {
+	public NoteBlockPlayers playBlock(Block nb, boolean loop) {
 		return new NoteBlockPlayers(nb, this, loop);
 	}
 
@@ -238,6 +241,7 @@ public class MidiSheet implements ConfigurationSerializable {
 	public Map<String, Object> serialize() {
 		Map<String, Object> map = new HashMap<>();
 		map.put("tracks", tracks);
+		map.put("name",filename);
 		return map;
 	}
 }

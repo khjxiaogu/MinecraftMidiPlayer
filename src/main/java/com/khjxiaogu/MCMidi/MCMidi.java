@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -15,7 +16,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.block.NoteBlock;
 import org.bukkit.command.BlockCommandSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -64,10 +64,9 @@ public class MCMidi extends JavaPlugin {
 						loaded.put(args[1], mp);
 						sender.sendMessage(Messages.getString("MCMidi.midi_loaded") + args[1]); //$NON-NLS-1$
 						return true;
-					} else {
-						sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
-						return false;
 					}
+					sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
+					return false;
 				} catch (InvalidMidiDataException | IOException e) {
 					// TODO Auto-generated catch block
 					sender.sendMessage(Messages.getString("MCMidi.invalid_midi")); //$NON-NLS-1$
@@ -143,11 +142,11 @@ public class MCMidi extends JavaPlugin {
 					return false;
 				}
 				Block ob = l.getBlock();
-				if (ob == null || ob.getType() != Material.NOTE_BLOCK) {
+				/*if (ob == null || ob.getType() != Material.NOTE_BLOCK) {
 					sender.sendMessage(Messages.getString("MCMidi.not_note_block"));
 					return false;
-				}
-				nbs.put(l, mp.playBlock((NoteBlock) ob.getState(), true));
+				}*/
+				nbs.put(l, mp.playBlock(ob, true));
 				sender.sendMessage(Messages.getString("MCMidi.play_start")); //$NON-NLS-1$
 				return true;
 			} else if (args[0].equals("playblock")) { //$NON-NLS-1$
@@ -179,12 +178,12 @@ public class MCMidi extends JavaPlugin {
 					return false;
 				}
 				Block ob = l.getBlock();
-				if (ob == null || ob.getType() != Material.NOTE_BLOCK) {
+				/*if (ob == null || ob.getType() != Material.NOTE_BLOCK) {
 					sender.sendMessage(ob.getType().toString());
 					sender.sendMessage(Messages.getString("MCMidi.not_note_block"));
 					return false;
-				}
-				nbs.put(l, mp.playBlock((NoteBlock) ob.getState(), false));
+				}*/
+				nbs.put(l, mp.playBlock(ob, false));
 				sender.sendMessage(Messages.getString("MCMidi.play_start")); //$NON-NLS-1$
 				return true;
 			} else if (args[0].equals("loop")) { //$NON-NLS-1$
@@ -233,7 +232,7 @@ public class MCMidi extends JavaPlugin {
 				int width = 24;
 				Material type = Material.STONE;
 				if (args.length >= 3)
-					type = Material.getMaterial(Integer.valueOf(args[2]));
+					type = Material.getMaterial(args[2]);
 				if (args.length >= 4)
 					width = Integer.parseInt(args[3]);
 				if (!MidiAPI.generateStucture(args[1], p.getLocation(), width, type)) {
@@ -298,6 +297,13 @@ public class MCMidi extends JavaPlugin {
 					sender.sendMessage(s);
 				});
 				return true;
+			} else if (args[0].equals("listblock")) { //$NON-NLS-1$
+				sender.sendMessage(Messages.getString("MCMidi.list_of_block"));//$NON-NLS-1$
+				nbs.entrySet().forEach((s) -> {
+					Location l=s.getKey();
+					sender.sendMessage("x="+l.getBlockX()+",y="+l.getBlockY()+",z="+l.getBlockZ()+":"+s.getValue().getOrig().filename);
+				});
+				return true;
 			}
 		}
 		return false;
@@ -320,6 +326,7 @@ public class MCMidi extends JavaPlugin {
 			list.add("loopblock");//$NON-NLS-1$
 			list.add("stop");//$NON-NLS-1$
 			list.add("stopblock");
+			list.add("listblock");
 			list.add("info");//$NON-NLS-1$
 			list.add("list");//$NON-NLS-1$
 			list.add("generate");//$NON-NLS-1$
@@ -380,13 +387,33 @@ public class MCMidi extends JavaPlugin {
 				if (cs != null) {
 					for (String s : cs.getKeys(false)) {
 						try {
-							ConfigurationSection cur = cs.getConfigurationSection(s);
-							getLogger().info("loading " + cur.getString("name"));
-							loaded.put(cur.getString("name"), (MidiSheet) cur.get("midi"));//$NON-NLS-1$ //$NON-NLS-2$
+							MidiSheet ms;
+							if(cs.isConfigurationSection(s)) {
+								ConfigurationSection old=cs.getConfigurationSection(s);
+								ms=(MidiSheet) old.get("midi");
+								ms.filename=old.getString("name");
+							}else
+								ms=(MidiSheet) cs.get(s);
+							getLogger().info("loaded " + ms.filename);
+							loaded.put(ms.filename, ms);//$NON-NLS-1$ //$NON-NLS-2$
 						} catch (Throwable t) {
 							getLogger().info("midi " + s + " load failure");//$NON-NLS-1$ //$NON-NLS-2$
 							t.printStackTrace();
 						}
+					}
+				}
+				ConfigurationSection csb = midifile.getConfigurationSection("block");
+				if(csb!=null) {
+					for (String s : csb.getKeys(false)) {
+						ConfigurationSection csl=csb.getConfigurationSection(s);
+						Location l=csl.getLocation("location");
+						Block ob = l.getBlock();
+						MidiSheet mp = loaded.get(csl.getString("file"));
+						if (mp == null) {
+							this.getLogger().warning("cannot find file"+csl.getString("file"));
+							continue;
+						}
+						nbs.put(l, mp.playBlock(ob,true));
 					}
 				}
 			} catch (IOException | InvalidConfigurationException e) {
@@ -400,11 +427,18 @@ public class MCMidi extends JavaPlugin {
 	public void onDisable() {
 		MCMidi.plugin = this;
 		ConfigurationSection cs = midifile.createSection("midi");//$NON-NLS-1$
-		int i = 0;
+		ConfigurationSection bcs = midifile.createSection("block");
+		int i=0;
+		for(Entry<Location, NoteBlockPlayers> s:nbs.entrySet()) {
+			if(s.getValue().isLoop()) {
+				ConfigurationSection bbcs=bcs.createSection(String.valueOf(i++));
+				bbcs.set("location",s.getKey());
+				bbcs.set("file",s.getValue().getOrig().filename);
+			}
+		}
+		i=0;
 		for (Map.Entry<String, MidiSheet> entry : loaded.entrySet()) {
-			ConfigurationSection cur = cs.createSection(Integer.toString(i));
-			cur.set("name", entry.getKey());//$NON-NLS-1$
-			cur.set("midi", entry.getValue());//$NON-NLS-1$
+			cs.set(String.valueOf(i),entry.getValue());
 			i++;
 		}
 		try {

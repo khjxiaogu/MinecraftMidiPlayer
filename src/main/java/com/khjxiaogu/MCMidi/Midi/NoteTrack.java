@@ -10,7 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.NoteBlock;
+import org.bukkit.block.data.type.Repeater;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.Player;
 import org.bukkit.material.Diode;
@@ -104,7 +104,7 @@ public class NoteTrack implements ConfigurationSerializable {
 	 * @param nb the nb<br>
 	 * @return return play all <br>返回 note block player
 	 */
-	public NoteBlockPlayer playAll(NoteBlock nb) {
+	public NoteBlockPlayer playAll(Block nb) {
 		NoteBlockPlayer ret = new NoteBlockPlayer(nb, this);
 		ret.play();
 		return ret;
@@ -183,10 +183,10 @@ public class NoteTrack implements ConfigurationSerializable {
 				if (currentWidth < clw) {
 					world.getBlockAt(direct.getBlockX(), direct.getBlockY() - 1, direct.getBlockZ()).setType(base);
 					Block b = world.getBlockAt(direct);
-					b.setType(Material.DIODE_BLOCK_OFF);
+					b.setType(Material.REPEATER);
 
-					Diode diode = (Diode) b.getState().getData();
-					diode.setFacingDirection(face);
+					Repeater diode = (Repeater) b.getBlockData();
+					diode.setFacing(face);
 					if (deltaTicks >= 4) {
 						diode.setDelay(4);
 						deltaTicks -= 4;
@@ -194,7 +194,7 @@ public class NoteTrack implements ConfigurationSerializable {
 						diode.setDelay((int) deltaTicks);
 						deltaTicks = 0;
 					}
-					b.setData(diode.getData());
+					b.setBlockData(diode);
 					direct.add(forward);
 					currentWidth++;
 				}
